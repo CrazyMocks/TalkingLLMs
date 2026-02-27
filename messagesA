@@ -1,0 +1,309 @@
+Rozpoczynamy nowy projekt. Twoim zadaniem jest przygotowanie specyfikacji technicznej wspólnie z Sentinelem.
+**TEMAT PROJEKTU:** Dokładna wizualizacja układu słonecznego z jak największą liczbą planet i ich księżyców. Odpalana lokalnie do uzytku prywatnego w postaci aplikacji python.
+Proszę, przedstaw wstępny zarys architektury, stack technologiczny (Frontend/Backend/DB) oraz główne funkcjonalności (MVP). Pamiętaj, że Sentinel będzie to audytował.
+
+
+---ENDOFMESSAGE---TALKINGLLMS---
+CANVAS, dziękuję za przedstawienie pierwszego szkicu. Doceniam chęć szybkiego przejścia do konkretów. Jednakże, jako SENTINEL, mam obowiązek poddać ten plan rygorystycznej analizie, by uniknąć problemów w przyszłości. Twój zapał jest godny pochwały, ale pragmatyzm i skrupulatność w projektowaniu systemowym są kluczowe.
+
+## CRITICAL REVIEW
+
+1.  **Architektura Zintegrowanego Monolitu:** Zrozumiałe jest dążenie do uproszczenia lokalnego wdrożenia. Jednakże, termin "zintegrowany monolit" jest nieprecyzyjny. Powinniśmy mówić o aplikacji desktopowej z jasno zdefiniowanymi warstwami. W przypadku aplikacji desktopowej, gdzie interfejs użytkownika jest sercem systemu, a backend stanowi jedynie dostarczyciela danych i logiki, podział na warstwy jest fundamentalny dla utrzymywalności. FastAPI jako "backend" w aplikacji desktopowej wymaga doprecyzowania. Czy planujesz uruchamiać serwer FastAPI jako osobną usługę w tle, z którą komunikuje się GUI, czy bezpośrednio integrować logikę FastAPI z GUI? Oba podejścia mają swoje implikacje.
+2.  **Stack Technologiczny:**
+    *   **Python:** Akceptowalne. Konkretna wersja 3.10+ jest dobrym wyborem.
+    *   **FastAPI:** Tu pojawia się kluczowe pytanie. Użycie FastAPI – frameworku typowo webowego, do komunikacji z aplikacją desktopową – jest co najmniej nietypowe. Jeśli celem jest aplikacja desktopowa, która ma działać lokalnie i nie wymagać zewnętrznych połączeń sieciowych (poza ewentualnym pobieraniem zasobów, co też nie jest ujęte), serwerowanie API za pomocą FastAPI może generować niepotrzebny narzut i złożoność. Czy nie prościej będzie wywoływać funkcje bezpośrednio z poziomu aplikacji GUI, wykorzystując dedykowane biblioteki Pythona? Jeśli jednak planujesz jakiekolwiek przyszłe rozszerzenia o komponent sieciowy, uzasadnienie jest silniejsze, ale musisz to jasno określić. Obecnie wydaje się to niepotwornym komplikowaniem.
+    *   **Biblioteki: `numpy`, `scipy`, `astropy`:** Absolutnie kluczowe i trafione. Bez uwag.
+    *   **Pydantic:** Użyteczny do modelowania danych, ale ponownie – czy jest niezbędny, jeśli nie budujemy jawnego API webowego? Jeśli FastAPI jest tylko "fasadą" dla logiki, Pydantic ma mniejsze znaczenie.
+    *   **Frontend (PyQt6/Kivy):** Wybór między PyQt6 a Kivy wymaga uzasadnienia. PyQt6 jest potężne, ale licencja (GPL/Commercial) może być problemem dla niektórych użytkowników (choć przy użytku prywatnym jest to mniej istotne). Kivy ma licencję MIT, co jest bardziej elastyczne. Oba wspierają OpenGL, co jest plusem. Musisz doprecyzować, jakie konkretne możliwości graficzne będą kluczowe (np. złożoność shaderów, interakcje 3D, wydajność przy dużej liczbie obiektów).
+    *   **OpenGL:** Dobry wybór do akceleracji graficznej, ale jego implementacja może być czasochłonna.
+    *   **Baza Danych (SQLite):** Rozsądne dla prostych, statycznych danych. Jednakże, jeśli zakres "jak największej liczby planet i ich księżyców" obejmuje dane astronomiczne z katalogów (np. JPL HORIZONS, SPICE kernels), sama SQLite może okazać się niewystarczająca do zarządzania tą ilością danych i ich relacjami. Czy dane będą pobierane z zewnętrznego źródła i ładowane do SQLite, czy będą to dane "wbudowane"?
+3.  **Diagram Architektury:** Diagram jest schematyczny i nie odzwierciedla dobrze intencji użycia FastAPI w aplikacji desktopowej. Strzałka "Żądanie Danych/Obliczeń" z GUI do API FastAPI w kontekście lokalnej aplikacji desktopowej jest niejasna. Jak "API FastAPI" komunikuje się z "Warstwą Logiki Biznesowej"? Czy to przez bezpośrednie wywołanie funkcji, czy przez mechanizm IPC (Inter-Process Communication), jeśli FastAPI działa jako osobny proces?
+4.  **Funkcjonalności MVP:**
+    *   **Podstawowa Wizualizacja:** Jasne i zrozumiałe.
+    *   **Interakcja Użytkownika:** Standardowe wymagania dla wizualizacji 3D.
+    *   **Podstawowe Dane Astronomiczne:** Użycie `astropy` jest trafne. Skalowanie przestrzenne to kluczowy problem – jak zapewnić widoczność zarówno Merkurego, jak i Neptuna jednocześnie? Wymaga to przemyślanego zarządzania kamerą i skalą.
+    *   **Księżyce:** Cel MVP jest rozsądny.
+
+## PYTANIA KLUCZOWE
+
+1.  **Uzasadnienie FastAPI:** Proszę o jasne wyjaśnienie, dlaczego planujesz użyć frameworka webowego (FastAPI) w aplikacji desktopowej działającej lokalnie. Jakie konkretne problemy rozwiązuje to podejście, które nie mogłyby być rozwiązane przez bezpośrednie wywoływanie funkcji Pythona z warstwy GUI? Czy jest to przygotowanie pod ewentualną przyszłą rozbudowę do wersji kliencko-serwerowej?
+2.  **Zarządzanie Danymi:** Skąd będą pochodzić dane o planetach i księżycach (ich parametry, tekstury)? Czy będą one wbudowane w aplikację, czy pobierane z zewnętrznych API/baz danych? Jeśli z zewnętrznych, jak będzie wyglądać zarządzanie tymi zależnościami i ich aktualizacją w lokalnej aplikacji? Jakie są oczekiwane źródła danych (np. konkretne katalogi astronomiczne)?
+3.  **Skala i Wydajność:** Jak zamierzasz zarządzać skalą Układu Słonecznego w wizualizacji? Odległości między planetami są ogromne. Jak zapewnisz widoczność wszystkich obiektów i płynność animacji, zwłaszcza przy dodaniu "jak największej liczby księżyców"? Jakie są oczekiwane zasoby systemowe (CPU, RAM, GPU) potrzebne do płynnego działania?
+4.  **Modelowanie Ruchu:** Czy symulacja ruchu będzie oparta na uproszczonych modelach (np. stałe okresy orbitalne) czy bardziej zaawansowanych (np. perturbacje orbitalne)? `astropy` oferuje szerokie możliwości, ale trzeba określić poziom szczegółowości.
+5.  **Wybór Frontend:** Proszę o rozszerzenie uzasadnienia wyboru między PyQt6 a Kivy, uwzględniając potencjalne koszty licencyjne (choć mówimy o użytku prywatnym, dobre praktyki są ważne) oraz specyficzne wymagania dotyczące interfejsu i grafiki. Szczególnie w kontekście wykorzystania OpenGL.
+6.  **Minimalizm i Złożoność:** Czy nie jest możliwe osiągnięcie celu MVP za pomocą prostszych narzędzi, np. biblioteki `tkinter` (często wystarczającej do prostych GUI w Pythonie) w połączeniu z `pygame` lub `pyglet` do renderowania grafiki 2D/3D, bez narzutu FastAPI?
+
+Przed przystąpieniem do dalszych kroków, te kwestie muszą zostać wyjaśnione. Obecny szkic jest zbyt powierzchowny i zawiera potencjalnie problematyczne wybory technologiczne bez odpowiedniego uzasadnienia.
+---ENDOFMESSAGE---TALKINGLLMS---
+CANVAS, Twoje doprecyzowania są krokiem w dobrym kierunku. Wyjaśnienie roli FastAPI jako inspiracji architektonicznej i narzędzia do modelowania danych, a nie faktycznego serwera, jest kluczowe. Również decyzja o podejściu do skalowania wizualizacji i wykorzystaniu PyQt6 z OpenGL jest bardziej przekonująca.
+
+Jednakże, nadal istnieją obszary wymagające głębszej analizy i standardyzacji.
+
+## CRITICAL REVIEW
+
+1.  **"FastAPI jako inspiracja" vs. Bezpośrednie Wywołania:** Rozumiem potrzebę modularności i organizacji kodu. Jednak stwierdzenie "inspiracja FastAPI" i "funkcje do obliczeń fizycznych będą dekorowane w sposób zbliżony do endpointów API" jest nadal dosyć abstrakcyjne. W praktyce, jak dokładnie będą wyglądały te "dekoracje"? Czy będziemy używać niestandardowych dekoratorów, czy po prostu traktować odpowiednie funkcje jako punkty dostępu do logiki? Musimy to ująć w kontekście standardów kodowania i dokumentacji.
+2.  **Modele Danych (Pydantic):** Użycie Pydantic do modelowania obiektów astronomicznych jest sensowne. Jak zamierzasz zdefiniować hierarchię tych modeli? Czy będziemy mieli bazowy model `CelestialBody` z dziedziczącymi `Star`, `Planet`, `Moon`, czy płaską strukturę danych z atrybutem `type`? Jak będą reprezentowane dane orbitalne (np. parametry Keplera: półosie, ekscentryczność, nachylenie, argument perycentrum, długość węzła wstępującego, anomalia średnia)?
+3.  **Źródło Danych (MVP):** "Dane 'wbudowane' (hardcoded lub wczytywane z prostych plików konfiguracyjnych, np. JSON/YAML)" dla MVP jest akceptowalne. Jednakże, musimy określić format tych plików i zapewnić, że ich struktura jest spójna i dobrze udokumentowana. Czy będziemy używać biblioteki do serializacji/deserializacji (np. `json`, `yaml`)? Jak będzie wyglądał schemat tych plików?
+4.  **Tekstury:** "Proste obrazy JPG/PNG". Czy rozważasz użycie formatów tekstur zoptymalizowanych pod kątem OpenGL (np. DDS) w dalszym etapie, jeśli wydajność stanie się problemem? Czy tekstury będą ładowane na żądanie, czy wszystkie na start?
+5.  **Licencja PyQt6:** Potwierdzenie, że licencja GPL jest akceptowalna *dla tego projektu* jest ważne. Jeżeli projekt miałby być kiedykolwiek udostępniony w sposób komercyjny, musimy mieć to na uwadze i być gotowi na pivot techniczny.
+6.  **Zarządzanie Kamerą i Skalą:** "Logarytmiczne skalowanie widoku" lub "automatyczne dostosowywanie dystansu kamery" to dobre kierunki. Jak konkretnie użytkownik będzie inicjował te zmiany? Czy będzie to automatyczne przy zmianie zaznaczonego obiektu, czy zostanie dodany dedykowany kontroler? Musimy przewidzieć scenariusze, w których użytkownik chce obserwować np. Ziemię i jej Księżyc, a potem nagle przełączyć się na widok całego Układu Słonecznego. To wymaga precyzyjnego projektowania interakcji.
+7.  **Dane Orbitalne:** MVP używa "uproszczonego modelu ruchu orbitalnego opartego na stałych okresach orbitalnych i eliptycznych orbitach". Czyli J2000.0 jako epoka? Jakiej biblioteki użyjesz do obliczenia pozycji obiektu na orbicie w danym czasie symulacyjnym? `Astropy` ma `Orbit` i `EarthLocation`, ale musimy to doprecyzować. Czy będziemy emulować upływ czasu (np. jeden "dzień" symulacji trwa 1 sekundę realnego czasu), czy użytkownik będzie mógł przesuwać czas ręcznie?
+8.  **Testy:** "Testy wydajnościowe z kilkudziesięcioma księżycami będą konieczne". To brzmi jak dobre założenie, ale musimy mieć strategię testowania. Jakie metryki będziemy śledzić (FPS, użycie pamięci)? Jakie narzędzia do testowania wydajności w Pythonie (np. `cProfile`, `memory_profiler`) rozważasz?
+9.  **Potrzeba API:** Wciąż nie mam pełnego przekonania co do całkowitego odrzucenia jakiejkolwiek formy API. Nawet aplikacja desktopowa może skorzystać z dobrze zdefiniowanego, wewnętrznego API (np. poprzez refleksję lub interfejsy), które ułatwi testowanie i modularność. Czy proponujesz po prostu zbiór funkcji w modułach, czy coś bardziej ustrukturyzowanego?
+
+## PYTANIA KLUCZOWE (aktualizacja)
+
+1.  **Struktura Modułów i "Dekoracje":** Jak dokładnie zorganizujemy kod backendowy? Proszę o propozycję struktury katalogów i modułów. Jak zdefiniujemy "punkty wejścia" do logiki biznesowej, skoro nie będzie to API webowe? Proszę o przykładowy pseudokod lub schemat przepływu danych dla jednej funkcjonalności (np. pobranie informacji o planecie i jej pozycji na orbicie).
+2.  **Modele Danych Astronomicznych:** Proszę o zdefiniowanie podstawowej hierarchii modeli danych dla obiektów niebieskich (np. `CelestialBody`, `Star`, `Planet`, `Moon`) z użyciem Pydantic, uwzględniając kluczowe parametry orbitalne i fizyczne dla MVP.
+3.  **Format Danych MVP:** Proszę o zdefiniowanie schematu pliku JSON/YAML do przechowywania danych o planetach i ich orbitach dla MVP.
+4.  **Zarządzanie Czasem i Ruchem:** Jak dokładnie będzie działać symulacja czasu? Czy będzie to prosty symulator czasu lokalnego, czy wykorzystamy biblioteki `astropy` do bardziej zaawansowanego śledzenia czasu astronomicznego? Jak użytkownik będzie kontrolował czas symulacji?
+5.  **Strategia Testowania:** Jaka będzie strategia testowania aplikacji? Proszę o zarys planu testów (jednostkowe, integracyjne, wydajnościowe) i wybór narzędzi.
+6.  **Dokumentacja API (wewnętrznego):** Nawet jeśli nie budujemy API webowego, potrzebujemy sposobu na dokumentowanie "interfejsu" między GUI a logiką biznesową. Jak zamierzamy to osiągnąć? Czy użyjemy narzędzi do generowania dokumentacji na podstawie komentarzy, czy manualnie?
+
+Twoje odpowiedzi powinny skupić się na konkretach i doprowadzić nas bliżej do formalnej specyfikacji technicznej. Zrozumienie tych punktów pozwoli na przejście do bardziej szczegółowego projektowania architektury i przygotowania podstaw do generowania kodu.
+---ENDOFMESSAGE---TALKINGLLMS---
+CANVAS, Twoje doprecyzowania są teraz znacznie bardziej konkretne i konstruktywne. Podoba mi się przemyślana struktura katalogów, hierarchia modeli danych Pydantic oraz plan zarządzania czasem i interakcją z kamerą. Użycie `astropy` do obliczeń orbitalnych jest oczywiście trafione.
+
+Jednakże, nadal uważam, że pewne aspekty wymagają dopracowania, zanim będziemy mogli uznać specyfikację za gotową.
+
+## CRITICAL REVIEW
+
+1.  **"Wewnętrzne API" i Dekoracje:** Nadal jestem sceptyczny co do używania sformułowania "dekoracje w sposób zbliżony do endpointów API" w kontekście funkcji Pythona, które nie są faktycznymi endpointami. Stwierdzenie, że "nie będą to dekoracje w sensie technologii webowych (jak `@app.get(...)`), ale standardowe funkcje z odpowiednimi komentarzami (docstrings) i ... użyciem Pydantic do walidacji parametrów wejściowych" jest właściwie opisem standardowego, dobrze napisanego kodu Python. Nie ma tam żadnych "dekoracji" od FastAPI. Użycie Pydantic do walidacji jest standardem w wielu nowoczesnych bibliotekach. Musimy być precyzyjni. Proponuję nazwać to **"Moduleskiem Logiki Biznesowej opartej na klasach z użyciem Pydantic do walidacji danych"**. To lepiej oddaje rzeczywistość.
+2.  **`DataRepository` i Aspekty Wydajnościowe:**
+    *   Twój `DataRepository` ma za zadanie ładować dane z SQLite lub plików JSON/YAML. Jak będzie wyglądało cachowanie danych? Czy po załadowaniu danych o planetach do obiektów Pydantic zostaną one jakoś zcache’owane w pamięci aplikacji, czy za każdym razem, gdy `CelestialBodyService` będzie potrzebował danych o ciele, będzie sięgał do `DataRepository`, który z kolei będzie odczytywał z pliku/BD? Dla MVP może to wystrzećczyć, ale przy "jak największej liczbie planet i ich księżyców" powtarzające się odczyty z dysku mogą stać się wąskim gardłem.
+    *   Jakie są oczekiwane rozmiary plików z danymi w MVP? Zakładając kilkaset obiektów, odczyt może trwać chwilę. Czy chcemy ładować wszystkie dane na start aplikacji, czy tylko te potrzebne?
+3.  **Obliczenia Orbitalne (Precyzja vs. Wydajność):**
+    *   Wykorzystanie `astropy.modeling.models.Keplerian` lub podobnych jest kluczowe. Czy zakładamy, że te modele gwarantują wystarczającą dokładność dla "realistycznej symulacji" w kontekście wizualnym? Czy rozważasz jakiekolwiek korekty (np. uwzględnienie wpływu innych planet na orbitę, nawet w uproszczony sposób) w przyszłości, czy MVP ściśle trzyma się idealnych orbit Keplera?
+    *   Jak dokładnie będzie wyglądać obrót kamery i interakcja podczas animacji? Czas symulacji będzie płynął, a jeśli użytkownik będzie chciał zobaczyć coś innego, jak szybko kamera się dostosuje? Czy aktualizacja pozycji obiektów i kamery będzie odbywać się w tej samej pętli renderowania? To może wpłynąć na płynność.
+4.  **Zarządzanie Zasobami Graficznymi (OpenGL):**
+    *   Ładowanie tekstur "na żądanie" jest dobrym pomysłem. Ale czy będziemy zarządzać stertą tekstur w pamięci GPU? Co się stanie, gdy dodamy setki księżyców i ich unikalnych tekstur? Czy będziemy je usuwać z pamięci GPU, gdy nie są widoczne, aby zwolnić miejsce? To jest kluczowy aspekt optymalizacji w aplikacjach graficznych. Wymagałoby to prawdopodobnie bardziej zaawansowanego systemu zarządzania zasobami graficznymi.
+    *   Czy zakładamy, że użytkownik będzie miał kartę graficzną wspierającą co najmniej OpenGL 3.3 (wymagane dla wielu nowoczesnych shaderów)?
+5.  **Format Danych (JSON):** JSON jest prosty, ale dla dużej liczby obiektów może być mniej wydajny niż format binarny (np. Protobuf, FlatBuffers) pod względem rozmiaru i szybkości parsowania. Czy MVP opierające się na JSON jest wystarczające, czy powinniśmy już teraz rozważyć ścieżkę ewoluującą w kierunku formatu binarnego?
+6.  **Testy Wydajnościowe:** Dobrze, że planujesz testy wydajnościowe. Ale jaki jest **oczekiwany próg wydajności**? Jaki FPS jest akceptowalny dla MVP? 30 FPS? 60 FPS? Brak zdefiniowanego celu utrudnia ocenę sukcesu testów.
+
+## PYTANIA KLUCZOWE (Finalne przed dokumentacją)
+
+1.  **Nazewnictwo "Wewnętrznego API":** Proszę o finalne, precyzyjne nazwanie sposobu, w jaki GUI będzie komunikować się z logiką biznesową. Czy to "Serwis Logiki Biznesowej", "Warstwa Domenowa", "Moduły Domenowe"? Unikajmy terminów sugerujących web API.
+2.  **Strategia Cachingu Danych:** Jak dokładnie będzie działało cachowanie danych w pamięci aplikacji po ich załadowaniu przez `DataRepository`? Czy wszystkie dane zostaną załadowane na start i zcache’owane, czy będą ładowane i cachowane selektywnie? Jak będzie wyglądał mechanizm odświeżania cache, jeśli (co nie jest planowane w MVP) dane zewnętrzne miałyby być aktualizowane?
+3.  **Precyzja Obliczeń Orbitalnych:** Proszę o jednoznaczną deklarację dotyczącą precyzji obliczeń w MVP: czy pracujemy na idealnych orbitach Keplera (bez perturbacji), czy uwzględniamy minimalne, uproszczone korekty? Jaka jest epoka dla parametrów orbitalnych (zapewne J2000.0, ale potwierdź)?
+4.  **Zarządzanie Teksturami i Zasobami GPU:** Jaki jest plan zarządzania zasobami GPU (zwłaszcza teksturami) przy dużej liczbie obiektów? Czy zakładamy, że będziemy po prostu ładować wszystkie potrzebne tekstury do pamięci GPU na start, czy potrzebny jest bardziej zaawansowany mechanizm zarządzania cyklem życia zasobów?
+5.  **Docelowa Wydajność (FPS):** Jaki jest minimalny akceptowalny poziom FPS dla MVP, aby uznać wizualizację za płynną i użyteczną?
+6.  **Format Danych - Decyzja:** Czy trzymamy się JSON dla MVP, akceptując jego ograniczenia, czy rozważamy format binarny już na tym etapie (co mogłoby skomplikować MVP, ale zapewnić lepszą przyszłość)?
+
+Twoje odpowiedzi na te pytania pozwolą mi zamknąć specyfikację. Jeżeli te punkty zostaną jasno i przekonująco wyjaśnione, będziemy mogli przejść do finalizacji dokumentacji.
+---ENDOFMESSAGE---TALKINGLLMS---
+CANVAS, Twoje odpowiedzi są teraz zadowalające. Precyzja w nazewnictwie, jasne określenie zakresu MVP w kwestii obliczeń orbitalnych i zarządzania zasobami, a także ustalone cele wydajnościowe i format danych, pozwalają mi uznać ten projekt za gotowy do formalnego udokumentowania.
+
+Nie mam dalszych pytań. Przechodzimy do generowania dokumentacji.
+
+<FINALDOCS>
+# Specyfikacja Techniczna: Wizualizacja Układu Słonecznego
+
+## 1. Wprowadzenie
+
+Niniejszy dokument określa specyfikację techniczną aplikacji desktopowej do wizualizacji Układu Słonecznego. Głównym celem jest stworzenie lokalnej aplikacji w języku Python, która zapewnia dokładną wizualizację planet, ich księżyców oraz Słońca, umożliwiając interakcję użytkownika z symulowanym środowiskiem astronomicznym. Aplikacja ma być łatwa w uruchomieniu i obsłudze dla użytkowników indywidualnych.
+
+## 2. Architektura
+
+Aplikacja będzie miała budowę **Monolitycznej Aplikacji Desktopowej z Wydzielonymi Warstwami Logiki i Prezentacji**. Nie będzie to aplikacja klient-serwer ani tradycyjny monolit z serwerem HTTP. Logika biznesowa i obliczenia będą wywoływane bezpośrednio z poziomu interfejsu użytkownika.
+
+*   **Styl Architektoniczny:** Warstwowy (Prezentacji, Domenowa, Danych).
+*   **Główne Warstwy:**
+    *   **Warstwa Prezentacji (GUI):** Odpowiedzialna za interfejs użytkownika, renderowanie grafiki 3D i obsługę interakcji użytkownika.
+    *   **Warstwa Domenowa (Domain Layer):** Zawiera główną logikę biznesową, obliczenia fizyczne, symulację czasu i ruchu orbitalnego. Komunikuje się z Warstwą Danych.
+    *   **Warstwa Danych (Data Layer):** Odpowiedzialna za ładowanie i zarządzanie danymi astronomicznymi (z plików konfiguracyjnych, bazy SQLite).
+*   **Wewnętrzne API:** Interakcja między Warstwą Prezentacji a Warstwą Domenową będzie odbywać się poprzez publiczne metody dedykowanych **Serwisów Biznesowych**. Modele danych Pydantic będą służyć jako kontrakt danych.
+
+### 2.1. Struktura Katalogów
+
+```
+/project_root
+    /app
+        /core
+            __init__.py       # Inicjalizacja projektu, konfiguracja
+            exceptions.py     # Niestandardowe wyjątki
+            settings.py       # Ustawienia aplikacji (np. ścieżka do bazy SQLite)
+        /data
+            __init__.py
+            models.py         # Modele Pydantic dla obiektów astronomicznych
+            repository.py     # Logika dostępu do danych (SQLite/pliki)
+        /domain
+            __init__.py
+            celestial_bodies.py # Logika planet, księżyców itp. (Serwisy Biznesowe)
+            simulation.py     # Logika symulacji czasu i ruchu
+        /utils
+            __init__.py
+            # Pomocnicze funkcje, np. do konwersji jednostek, matematyki
+        main.py               # Główny punkt wejścia aplikacji desktopowej (inicjalizacja i uruchomienie GUI)
+    /gui
+        __init__.py
+        main_window.py        # Główna klasa okna PyQt6
+        widgets/              # Wszystkie niestandardowe widgety
+        scene.py              # Scena renderowania OpenGL
+    /resources
+        textures/             # Pliki tekstur planet
+        data/                 # Pliki konfiguracyjne (JSON) z danymi MVP
+    tests/                    # Testy jednostkowe i integracyjne
+```
+
+## 3. Stack Technologiczny
+
+*   **Język Programowania:** Python 3.10+
+*   **Warstwa Domenowa (Backend Logic):**
+    *   **Biblioteki:**
+        *   `astropy`: Kluczowa biblioteka do obliczeń astronomicznych, jednostek, koordynatów i czasu.
+        *   `numpy`: Do obliczeń numerycznych.
+        *   `scipy`: Do zaawansowanych obliczeń naukowych (jeśli potrzebne).
+        *   `Pydantic`: Do modelowania i walidacji danych.
+*   **Warstwa Prezentacji (Frontend/GUI):**
+    *   **Framework GUI:** PyQt6
+    *   **Silnik Graficzny:** OpenGL (bezpośrednio przez PyQt6)
+*   **Baza Danych / Przechowywanie Danych:**
+    *   **Format danych MVP:** JSON (w katalogu `/resources/data/`)
+    *   **Dla przyszłych rozszerzeń:** SQLite (bezpośrednio przez moduł `sqlite3` lub przez SQLAlchemy jako ORM)
+*   **Narzędzia Deweloperskie:**
+    *   `pytest` / `unittest`: Do testowania.
+    *   `cProfile`, `memory_profiler`: Do testów wydajnościowych.
+    *   `Sphinx`: Do generowania dokumentacji z docstrings.
+
+## 4. Modele Danych (Pydantic)
+
+Zdefiniowana zostanie hierarchia modeli danych dla obiektów astronomicznych, bazująca na `Pydantic`.
+
+```python
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict, Any
+from enum import Enum
+
+class OrbitalElements(BaseModel):
+    semi_major_axis: float  # AU
+    eccentricity: float     # nondim.
+    inclination: float      # degrees
+    longitude_ascending_node: float # degrees
+    argument_of_periapsis: float    # degrees
+    mean_anomaly_at_epoch: float    # degrees
+    epoch: str              # e.g., "J2000"
+
+class CelestialBodyType(str, Enum):
+    STAR = "star"
+    PLANET = "planet"
+    MOON = "moon"
+    DWARF_PLANET = "dwarf_planet"
+    ASTEROID = "asteroid"
+
+class CelestialBody(BaseModel):
+    id: str                     # Unikalny identyfikator (np. "sun", "earth", "moon_of_earth")
+    name: str                   # Nazwa wyświetlana użytkownikowi
+    body_type: CelestialBodyType
+    mass: float = Field(..., description="Masa w kg")
+    radius: float = Field(..., description="Średni promień w km")
+    texture_path: Optional[str] # Ścieżka do tekstury
+    parent_id: Optional[str]    # ID ciała nadrzędnego (np. ID Ziemi dla Księżyca)
+    orbital_elements: Optional[OrbitalElements] # Parametry orbitalne względem ciała nadrzędnego
+
+class Planet(CelestialBody):
+    body_type: CelestialBodyType = CelestialBodyType.PLANET
+    moons: List[str] = []       # Lista ID księżyców
+
+class Moon(CelestialBody):
+    body_type: CelestialBodyType = CelestialBodyType.MOON
+
+class Star(CelestialBody):
+    body_type: CelestialBodyType = CelestialBodyType.STAR
+
+```
+
+## 5. Dane MVP
+
+Dane dla MVP (Słońce, planety Układu Słonecznego, kluczowe księżyce) zostaną zapisane w pliku JSON w katalogu `/resources/data/`.
+
+*   **Format:** JSON
+*   **Zawartość:** Lista obiektów `CelestialBody` (lub ich podtypów) z ich parametrami fizycznymi i orbitalnymi (epoka J2000.0).
+*   **Przykład struktury:**
+    ```json
+    [
+      {
+        "id": "sun",
+        "name": "Słońce",
+        "body_type": "star",
+        "mass": 1.989e30,
+        "radius": 696340,
+        "texture_path": "resources/textures/sun.jpg",
+        "parent_id": null,
+        "orbital_elements": null
+      },
+      {
+        "id": "mercury",
+        "name": "Merkury",
+        "body_type": "planet",
+        "mass": 3.301e23,
+        "radius": 2439.7,
+        "texture_path": "resources/textures/mercury.jpg",
+        "parent_id": "sun",
+        "orbital_elements": {
+          "semi_major_axis": 0.387,
+          "eccentricity": 0.206,
+          "inclination": 7.004,
+          "longitude_ascending_node": 48.331,
+          "argument_of_periapsis": 29.124,
+          "mean_anomaly_at_epoch": 17.94,
+          "epoch": "J2000"
+        },
+        "moons": []
+      }
+      // ... inne obiekty
+    ]
+    ```
+*   **Ładowanie Danych:** Wszystkie dane MVP zostaną załadowane na start aplikacji i zcache’owane w pamięci RAM w formie obiektów Pydantic.
+
+## 6. Funkcjonalności (MVP - Minimum Viable Product)
+
+1.  **Podstawowa Wizualizacja Słońca i Planet:**
+    *   Model Słońca, Merkurego, Wenus, Ziemi, Marsa, Jowisza, Saturna, Urana, Neptuna.
+    *   Planety jako kule z teksturami i poprawnymi proporcjami rozmiarów.
+    *   **Ruch Orbitalny:** Symulacja ruchu planet wokół Słońca na idealnych orbitach eliptycznych (Keplera) z epoką J2000.0.
+    *   **Skala Wizualna:** Proporcjonalne zachowanie odległości planet, z automatycznym dostosowaniem kamery dla widoczności.
+
+2.  **Interakcja Użytkownika:**
+    *   **Zoom:** Ręczny zoom kamery (np. rolką myszy), z płynnym przejściem logarytmicznym.
+    *   **Pan/Orbit:** Ręczne przesuwanie i obracanie kamery.
+    *   **Wybór Obiektu:** Kliknięcie na obiekt wyświetla jego podstawowe informacje (nazwa, typ, promień, masa).
+    *   **Automatyczne Dostosowanie Kamery:** Po wyborze obiektu, kamera płynnie przechodzi do optymalnego widoku tego obiektu.
+    *   **Przełączanie Widoków:** Opcje "Widok Układu Słonecznego" i "Widok [Nazwa Planety] z Księżycami".
+
+3.  **Symulacja Czasu:**
+    *   **Sterowanie:** Przyciski "Play/Pause", suwak do ręcznego przesuwania czasu.
+    *   **Prędkość:** Skalowalna prędkość symulacji (np. dni/sekundę).
+    *   **Podstawa:** Użycie `astropy.time.Time` do zarządzania czasem symulacyjnym.
+
+4.  **Księżyce Kluczowych Planet:**
+    *   Dodanie największych i najbardziej znanych księżyców dla Jowisza (Io, Europa, Ganimedes, Kallisto) i Saturna (Tytan).
+    *   Wizualizacja ich ruchu orbitalnego wokół macierzystych planet.
+
+## 7. Wizualizacja i Grafika (OpenGL)
+
+*   **Renderowanie:** Scena 3D będzie renderowana przy użyciu **OpenGL** za pośrednictwem biblioteki `PyQt6`.
+*   **Obiekty:** Planety i księżyce jako sfery z teksturami.
+*   **Tekstury:**
+    *   Format: JPG/PNG dla MVP.
+    *   Ładowanie: Tekstury będą ładowane na żądanie do pamięci GPU dla aktualnie widocznych obiektów.
+    *   Zarządzanie zasobami: MVP zakłada proste ładowanie bez zaawansowanego zarządzania cyklem życia tekstur w pamięci GPU.
+*   **Wymagania Sprzętowe:** Karta graficzna wspierająca co najmniej **OpenGL 3.3**.
+
+## 8. Wydajność
+
+*   **Docelowa Wydajność:** Minimalny akceptowalny poziom **30 klatek na sekundę (FPS)**, z celem utrzymania **30-60 FPS** na typowym sprzęcie.
+*   **Testowanie:** Testy jednostkowe, integracyjne i wydajnościowe z wykorzystaniem `pytest`, `cProfile`, `memory_profiler`. Analiza FPS i użycia pamięci.
+
+## 9. Dokumentacja
+
+*   **Kod:** Obszerne komentarze (`docstrings`) w kodzie Pythona, definiujące interfejsy (Serwisy Biznesowe, modele Pydantic).
+*   **Generowanie:** Rozważone użycie `Sphinx` do generowania czytelnej dokumentacji HTML na podstawie `docstrings`.
+
+## 10. Licencja
+
+*   **Aplikacja:** PyQt6 na licencji **GPL** (zgodnie z przeznaczeniem projektu jako aplikacja prywatna).
+
+</FINALDOCS>
+<ENDOFDOCSGENERATION>
+---ENDOFMESSAGE---TALKINGLLMS---

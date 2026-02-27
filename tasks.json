@@ -1,0 +1,190 @@
+[
+    {
+        "id": "TASK_CORE_INIT_001",
+        "agent_type": "B",
+        "instructions": "Zdefiniuj podstawowe klasy modelu dla kształtów geometrycznych (np. `Shape`, `Rectangle`, `Circle`, `Line`). Utwórz klasę `ProjectManager` do przechowywania kolekcji kształtów oraz konfiguracji projektu. Zaimplementuj prostą walidację wymiarów i typów w modelach i `ProjectManager`.",
+        "required_stack": [
+            "Python 3.9+",
+            "uuid"
+        ],
+        "dependencies": []
+    },
+    {
+        "id": "TASK_UI_INIT_001",
+        "agent_type": "C",
+        "instructions": "Stwórz główną klasę aplikacji `GeometryDesignerApp` dziedziczącą po `tk.Tk`. Zainicjalizuj główne okno z menu (Plik: Zapisz, Wczytaj), podstawowym `tk.Canvas`. Utwórz pusty panel właściwości (na razie bez funkcjonalności). Połącz główne okno z instancją `ProjectManager` z modułu `core.models`.",
+        "required_stack": [
+            "Python 3.9+",
+            "tkinter"
+        ],
+        "dependencies": [
+            "TASK_CORE_INIT_001"
+        ]
+    },
+    {
+        "id": "TASK_CONTROLLER_INIT_001",
+        "agent_type": "B",
+        "instructions": "Zaimplementuj podstawową klasę `AppController`. Klasa ta powinna pośredniczyć między `GeometryDesignerApp` (UI) a `ProjectManager` (Model). Musi obsługiwać podstawowe zdarzenia z UI i wywoływać odpowiednie metody w modelu. Zacznij od implementacji metod do dodawania i usuwania kształtów.",
+        "required_stack": [
+            "Python 3.9+"
+        ],
+        "dependencies": [
+            "TASK_CORE_INIT_001",
+            "TASK_UI_INIT_001"
+        ]
+    },
+    {
+        "id": "TASK_UI_CANVAS_DRAW_SELECT_001",
+        "agent_type": "C",
+        "instructions": "W widżecie `tk.Canvas` zaimplementuj rysowanie obiektów przekazanych z `ProjectManager`. Po narysowaniu, przypisz im odpowiednie ID Canvasowe. Dodaj funkcjonalność zaznaczania kształtu poprzez kliknięcie na Canvasie. Zaznaczony kształt powinien być wizualnie wyróżniony (np. ramką). Odznaczenie kształtu następuje po kliknięciu w pusty obszar.",
+        "required_stack": [
+            "Python 3.9+",
+            "tkinter"
+        ],
+        "dependencies": [
+            "TASK_UI_INIT_001",
+            "TASK_CONTROLLER_INIT_001"
+        ]
+    },
+    {
+        "id": "TASK_CORE_SHAPE_CREATION_001",
+        "agent_type": "B",
+        "instructions": "Rozszerz modele kształtów o metody umożliwiające tworzenie obiektów na podstawie współrzędnych (np. kliknięcie i przeciągnięcie myszy). Zaimplementuj w `ProjectManager` logikę dodawania nowych kształtów na podstawie danych wejściowych. Metody te powinny być wywoływane z `AppController`.",
+        "required_stack": [
+            "Python 3.9+",
+            "uuid"
+        ],
+        "dependencies": [
+            "TASK_CORE_INIT_001",
+            "TASK_CONTROLLER_INIT_001"
+        ]
+    },
+    {
+        "id": "TASK_UI_TOOL_BOX_001",
+        "agent_type": "C",
+        "instructions": "Zaimplementuj prosty przybornik (Toolbox) z przyciskami wyboru kształtu (Kwadrat, Koło, Linia). Kliknięcie przycisku powinno ustawiać aktywny tryb rysowania w aplikacji, który będzie następnie obsługiwany przez `AppController` i Canvas.",
+        "required_stack": [
+            "Python 3.9+",
+            "tkinter"
+        ],
+        "dependencies": [
+            "TASK_UI_CANVAS_DRAW_SELECT_001",
+            "TASK_CORE_SHAPE_CREATION_001",
+            "TASK_CONTROLLER_INIT_001"
+        ]
+    },
+    {
+        "id": "TASK_UI_PROPERTY_PANEL_001",
+        "agent_type": "C",
+        "instructions": "Zaimplementuj funkcjonalność panelu właściwości. Po zaznaczeniu kształtu, panel powinien wyświetlać jego aktualne parametry (pozycja, wymiary, kolory, grubość linii). Dodaj pola wprowadzania danych i przyciski (np. do wyboru koloru). Zmiany wprowadzone w panelu powinny być aplikowane do zaznaczonego kształtu w modelu i natychmiast odzwierciedlone na Canvasie.",
+        "required_stack": [
+            "Python 3.9+",
+            "tkinter",
+            "tkinter.colorchooser"
+        ],
+        "dependencies": [
+            "TASK_UI_CANVAS_DRAW_SELECT_001",
+            "TASK_CONTROLLER_INIT_001"
+        ]
+    },
+    {
+        "id": "TASK_CORE_FILE_SAVE_001",
+        "agent_type": "B",
+        "instructions": "Zaimplementuj w `ProjectManager` (lub dedykowanej usłudze) funkcję `save_project(filepath)`, która zapisuje bieżący stan projektu (metadane, listę kształtów wraz z ich właściwościami i stylami) do pliku JSON. Użyj standardowej biblioteki `json`. Zadbaj o poprawne formatowanie.",
+        "required_stack": [
+            "Python 3.9+",
+            "json",
+            "uuid"
+        ],
+        "dependencies": [
+            "TASK_CORE_INIT_001"
+        ]
+    },
+    {
+        "id": "TASK_CORE_FILE_LOAD_001",
+        "agent_type": "B",
+        "instructions": "Zaimplementuj w `ProjectManager` funkcję `load_project(filepath)`, która wczytuje dane projektu z pliku JSON. Podczas ładowania przeprowadź walidację struktury pliku i danych kształtów. Wyrzuć niestandardowy błąd (`InvalidProjectFileError` lub podobny) w przypadku błędów. Zaktualizuj bieżący projekt w aplikacj.",
+        "required_stack": [
+            "Python 3.9+",
+            "json",
+            "uuid"
+        ],
+        "dependencies": [
+            "TASK_CORE_INIT_001",
+            "TASK_CORE_FILE_SAVE_001"
+        ]
+    },
+    {
+        "id": "TASK_UI_FILE_MENU_001",
+        "agent_type": "C",
+        "instructions": "Zintegruj funkcje zapisywania i wczytywania z menu Plik w głównym oknie aplikacji. Użyj `tkinter.filedialog` do wyboru plików. Obsłuż potencjalne błędy podczas ładowania (wyświetlając komunikat użytkownikowi). Po wczytaniu projektu, zaktualizuj Canvas i inne widoki.",
+        "required_stack": [
+            "Python 3.9+",
+            "tkinter",
+            "tkinter.filedialog"
+        ],
+        "dependencies": [
+            "TASK_UI_INIT_001",
+            "TASK_CONTROLLER_INIT_001",
+            "TASK_CORE_FILE_SAVE_001",
+            "TASK_CORE_FILE_LOAD_001"
+        ]
+    },
+    {
+        "id": "TASK_UI_CANVAS_TRANSFORM_001",
+        "agent_type": "C",
+        "instructions": "Zaimplementuj mechanizmy zoom i pan na `tk.Canvas`. Zoom powinien być obsługiwany przez kółko myszy (np. z przytrzymanym Shiftem), skupiając się na pozycji kursora. Pan powinien być obsługiwany przez przeciąganie myszką (np. ze środkowym przyciskiem lub przytrzymanym klawiszem). Po każdej zmianie transformacji, cały canvas powinien zostać przerysowany z uwzględnieniem nowej skali i translacji.",
+        "required_stack": [
+            "Python 3.9+",
+            "tkinter"
+        ],
+        "dependencies": [
+            "TASK_UI_CANVAS_DRAW_SELECT_001",
+            "TASK_CONTROLLER_INIT_001"
+        ]
+    },
+    {
+        "id": "TASK_CORE_TRANSFORM_MANAGER_001",
+        "agent_type": "B",
+        "instructions": "W `AppController` zaimplementuj przechowywanie i zarządzanie stanem transformacji widoku (skala, przesunięcie). Dodaj metody do aktualizacji tych parametrów na podstawie zdarzeń UI (zoom/pan). Dodaj metodę do resetowania widoku do domyślnych ustawień (skala 1.0, przesunięcie 0,0).",
+        "required_stack": [
+            "Python 3.9+"
+        ],
+        "dependencies": [
+            "TASK_CONTROLLER_INIT_001",
+            "TASK_UI_CANVAS_TRANSFORM_001"
+        ]
+    },
+    {
+        "id": "TASK_FULL_INTEGRATION_MVP_001",
+        "agent_type": "B",
+        "instructions": "Przeprowadź kompleksową integrację wszystkich zaimplementowanych modułów: Model, View, Controller. Upewnij się, że przepływ zdarzeń (rysowanie, zaznaczanie, edycja, zapis, odczyt, zoom/pan) działa poprawnie. Sprawdź walidację danych na każdym etapie.",
+        "required_stack": [],
+        "dependencies": [
+            "TASK_CORE_INIT_001",
+            "TASK_UI_INIT_001",
+            "TASK_CONTROLLER_INIT_001",
+            "TASK_UI_CANVAS_DRAW_SELECT_001",
+            "TASK_CORE_SHAPE_CREATION_001",
+            "TASK_UI_TOOL_BOX_001",
+            "TASK_UI_PROPERTY_PANEL_001",
+            "TASK_CORE_FILE_SAVE_001",
+            "TASK_CORE_FILE_LOAD_001",
+            "TASK_UI_FILE_MENU_001",
+            "TASK_UI_CANVAS_TRANSFORM_001",
+            "TASK_CORE_TRANSFORM_MANAGER_001"
+        ]
+    },
+    {
+        "id": "TASK_TESTING_MVP_001",
+        "agent_type": "C",
+        "instructions": "Napisz testy jednostkowe dla klas modelu (`Shape`, `ProjectManager`) oraz podstawowe testy integracyjne dla Controller-Model. Przygotuj zestaw scenariuszy testowych dla testów manualnych UI, pokrywających wszystkie funkcjonalności zdefiniowane w MVP. Zaimplementuj zautomatyzowany test odczytu/zapisu projektu.",
+        "required_stack": [
+            "Python 3.9+",
+            "unittest"
+        ],
+        "dependencies": [
+            "TASK_FULL_INTEGRATION_MVP_001"
+        ]
+    }
+]

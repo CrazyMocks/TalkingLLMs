@@ -1,0 +1,1 @@
+Program desktopowy do rysowania kształtów geometrycznych na płaszczyźnie. Użytkownik wybiera kształt, podaje wymiary i program go rysuje. Program ma być w stanie zapisać i odtworzyć projekt. Całość kodu jest napisana w języku Python. Program nie powinien korzystać z internetu.
