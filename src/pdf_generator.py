@@ -1,10 +1,10 @@
 import os
+import json
 import tempfile
 from datetime import datetime
 from pathlib import Path
 
 from message import Message
-
 
 HTML_TEMPLATE = """<!doctype html>
 <html lang="en">
@@ -40,6 +40,17 @@ HTML_TEMPLATE = """<!doctype html>
       margin: 5px 0 0 0;
       font-size: 0.85em;
       opacity: 0.8;
+    }}
+    
+    .metrics {{
+      background: #128c7e;
+      color: white;
+      padding: 15px 20px;
+      font-size: 0.9em;
+    }}
+    
+    .metrics p {{
+      margin: 5px 0;
     }}
     
     .chat {{
@@ -108,14 +119,12 @@ HTML_TEMPLATE = """<!doctype html>
       text-decoration: none;
     }}
     
-    /* Left side (name1) */
     .message.left {{
       align-self: flex-start;
       background: #ffffff;
       border-top-left-radius: 0;
     }}
     
-    /* Right side (name2) */
     .message.right {{
       align-self: flex-end;
       background: #dcf8c6;
@@ -136,6 +145,40 @@ HTML_TEMPLATE = """<!doctype html>
     .message.right .sender {{
       color: #128c7e;
     }}
+    
+    .system-prompts {{
+      background: #25d366;
+      color: white;
+      padding: 15px 20px;
+    }}
+    
+    .system-prompts h2 {{
+      margin: 0 0 10px 0;
+      font-size: 1.1em;
+    }}
+    
+    .system-prompt {{
+      background: rgba(255, 255, 255, 0.15);
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }}
+    
+    .system-prompt:last-child {{
+      margin-bottom: 0;
+    }}
+    
+    .system-prompt .name {{
+      font-weight: 600;
+      margin-bottom: 5px;
+      font-size: 0.9em;
+    }}
+    
+    .system-prompt .content {{
+      font-size: 0.85em;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }}
   </style>
 </head>
 <body>
@@ -143,9 +186,23 @@ HTML_TEMPLATE = """<!doctype html>
     <h1>{title}</h1>
     <p>{timestamp}</p>
   </div>
-  <div class="chat" id="chat">
-{messages}
+  <div class="metrics">
+    <p><strong>Liczba wiadomości:</strong> {num_of_messages}</p> 
+    <p><strong>Model {nameA}:</strong> {modelA}</p> 
+    <p><strong>Model {nameB}:</strong> {modelB}</p>
   </div>
+  <div class="system-prompts">
+    <h2>System Prompts</h2>
+    <div class="system-prompt">
+      <div class="name">{nameA}</div>
+      <div class="content">{system_prompt_a}</div>
+    </div>
+    <div class="system-prompt">
+      <div class="name">{nameB}</div>
+      <div class="content">{system_prompt_b}</div>
+    </div>
+  </div>
+  <div class="chat" id="chat"></div>
   <script>
     function escapeHtml(text) {{
       const div = document.createElement('div');
@@ -153,12 +210,14 @@ HTML_TEMPLATE = """<!doctype html>
       return div.innerHTML;
     }}
     
-    const messages = {messages};
+    const messages = {messages_data};
+    const chatContainer = document.getElementById('chat');
+    
     messages.forEach(msg => {{
       const div = document.createElement('div');
       div.className = 'message ' + msg.side;
       div.innerHTML = '<div class="sender">' + escapeHtml(msg.sender) + '</div>' + marked.parse(msg.content);
-      document.getElementById('chat').appendChild(div);
+      chatContainer.appendChild(div);
     }});
   </script>
 </body>
@@ -170,33 +229,40 @@ def generate_pdf(
     output_path: str,
     name1: str,
     name2: str,
+    model1: str,
+    model2: str,
+    system_prompt1: str = "",
+    system_prompt2: str = "",
     style: str = "whatsapp",
 ) -> None:
-    """Generate a PDF from messages using Playwright and HTML.
+    """Generate a PDF from messages using Playwright and HTML."""
     
-    Args:
-        messages: List of (Message, sender_name) tuples
-        output_path: Path to save the PDF
-        name1: Name of the first agent
-        name2: Name of the second agent
-        style: Style to use (currently only 'whatsapp' is supported)
-    """
-    messages_json = []
+    # Tworzymy czystą strukturę danych i zrzucamy do JSON-a
+    formatted_messages = []
     for message, sender in messages:
         side = "left" if sender == name1 else "right"
-        content = message.get_content() or ""
-        content = content.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n")
-        messages_json.append(f'{{"sender": "{sender}", "content": "{content}", "side": "{side}"}}')
+        formatted_messages.append({
+            "sender": sender,
+            "content": message.get_content() or "",
+            "side": side
+        })
     
-    messages_html = ",".join(messages_json)
-    
+    messages_json = json.dumps(formatted_messages)
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
     title = f"Chat between {name1} and {name2}"
     
+    # Podstawiamy dane pod odpowiednie klucze
     html_content = HTML_TEMPLATE.format(
         title=title,
         timestamp=timestamp,
-        messages=f"[{messages_html}]",
+        messages_data=messages_json,
+        num_of_messages=len(messages),
+        nameA=name1,
+        nameB=name2,
+        modelA=model1,
+        modelB=model2,
+        system_prompt_a=system_prompt1 or "Brak system promptu",
+        system_prompt_b=system_prompt2 or "Brak system promptu",
     )
     
     with tempfile.NamedTemporaryFile(

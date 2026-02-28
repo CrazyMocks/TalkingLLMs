@@ -7,8 +7,9 @@ from agent import Agent
 from conversation import ConversationBtwAgents
 from message import Message
 from utils import load_file
+from openrouterModels import fetch_20_most_popular_openrouter_models
 
-
+defaultModel = 'arcee-ai/trinity-large-preview:free'
 def get_api_key() -> str:
     api_key = os.environ.get("OPENROUTER_API_KEY", "")
     if not api_key:
@@ -18,14 +19,8 @@ def get_api_key() -> str:
     return api_key
 
 
-def get_available_models() -> list[str]:
-    return [
-        "google/gemini-2.0-flash-001",
-        "anthropic/claude-3.5-sonnet",
-        "openai/gpt-4o",
-        "meta-llama/llama-3.3-70b-instruct",
-        "deepseek/deepseek-chat",
-    ]
+def get_available_models():
+    return fetch_20_most_popular_openrouter_models()
 
 
 def prompt_model_selection(prompt: str, default: str = "") -> str:
@@ -124,6 +119,8 @@ def main():
     print("\n=== LLM Conversation Generator ===\n")
 
     models = get_available_models()
+    models_formated_names = list(models.keys())
+    
     
     if args.name1 and args.name2 and args.system1 and args.system2 and args.init:
         name1 = args.name1
@@ -153,18 +150,17 @@ def main():
                 break
         
         print("\nAvailable models:")
-        for i, m in enumerate(models, 1):
+        for i, m in enumerate(models_formated_names, 1):
             print(f"  {i}. {m}")
-        print()
         
         print(f"Model for {name1}:")
-        model1_choice = prompt_model_selection(f"  (number or Enter for {models[0]}): ")
-        model1 = models[0]
+        model1_choice = prompt_model_selection(f"  (number or Enter for {defaultModel}): ")
+        model1 = models[models_formated_names[0]]
         if model1_choice:
             try:
                 idx = int(model1_choice) - 1
                 if 0 <= idx < len(models):
-                    model1 = models[idx]
+                    model1 = models[models_formated_names[idx]]
             except ValueError:
                 model1 = model1_choice
         
@@ -175,7 +171,7 @@ def main():
             try:
                 idx = int(model2_choice) - 1
                 if 0 <= idx < len(models):
-                    model2 = models[idx]
+                    model2 = models[models_formated_names[idx]]
             except ValueError:
                 model2 = model2_choice
         print(f"\nEnter system prompt for {name1} (press Enter for default):")
@@ -215,7 +211,7 @@ def main():
     )
 
     from pdf_generator import generate_pdf
-    generate_pdf(messages, args.output, name1, name2)
+    generate_pdf(messages, args.output, name1, name2, model1, model2)
     
     print(f"\n=== Conversation saved to {args.output} ===")
 
