@@ -43,7 +43,7 @@ Before you begin, you need:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/TalkingLLMs.git
+git clone https://github.com/CrazyMocks/TalkingLLMs.git
 cd TalkingLLMs
 
 # Create virtual environment (recommended)
