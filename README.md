@@ -25,7 +25,7 @@ The agents take turns responding to each other, and the entire conversation is e
 - 🤖 Multi-agent conversations with customizable personalities
 - 📄 PDF export of complete conversations
 - 🔧 Multiple ways to run: interactive, command-line, or config file
-- 🌐 Access to 20+ popular LLM models via OpenRouter
+- 🌐 Access to 600+ popular LLM models via OpenRouter
 - 💬 Both agents can use different models
 
 ## Prerequisites
