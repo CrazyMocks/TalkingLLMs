@@ -1,14 +1,11 @@
 import requests
 import json
-from message import Message
-from utils import load_file
-typesOfAgents = ['Canvas', 'Sentinel', 'SeniorSoftwareArchitect', 'SeniorSoftwareDeveloper', 'TechLead', 'CodeScout','Meta']
+from .message import Message
+from .utils import load_file
 class Agent:
     def __init__(self, model="openrouter/pony-alpha", typeOfAgent='', api_key="",temperature=1, system_prompt=""):
         self.typeOfAgent = typeOfAgent
-        if typeOfAgent not in typesOfAgents and system_prompt == "":
-            raise ValueError("Invalid agent type. Must be one of: " + ', '.join(typesOfAgents))
-        self.system_prompt = system_prompt if system_prompt else load_file(f"prompts/systemPrompt{typeOfAgent}.txt")
+        self.system_prompt = system_prompt if system_prompt else load_file(f"prompts/defaultPrompt{typeOfAgent}")
         self.temperature = temperature
         self.messages = [Message("system", self.system_prompt)]
         self.model = model

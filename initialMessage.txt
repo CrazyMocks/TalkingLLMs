@@ -1,4 +1,0 @@
-Rozpoczynamy nowy projekt. Twoim zadaniem jest przygotowanie specyfikacji technicznej wspólnie ze mną czyli Sentinelem.
-**TEMAT PROJEKTU:** <Project Description>
-Proszę, przedstaw wstępny zarys architektury, stack technologiczny (Frontend/Backend/DB) oraz główne funkcjonalności (MVP). Pamiętaj, że ja (Sentinel) będę to audytował.
-

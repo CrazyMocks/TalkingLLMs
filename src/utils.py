@@ -1,4 +1,4 @@
-from message import Message
+from .message import Message
 import os
 import importlib
 import inspect
@@ -140,8 +140,10 @@ def get_tag_content(tag, response_text):
     start_tag = f"<{tag}>"
     end_tag = f"</{tag}>"
     start_index = response_text.find(start_tag)
-    end_index = response_text.rfind(end_tag)
-    if start_index == -1 or end_index == -1 or start_index >= end_index:
+    if start_index == -1:
+        return ""
+    end_index = response_text.find(end_tag, start_index + len(start_tag))
+    if end_index == -1:
         return ""
     return response_text[start_index + len(start_tag):end_index]
 def export_file(string, file_name):
