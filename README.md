@@ -244,4 +244,16 @@ MIT License - Feel free to use and modify!
 
 ---
 
-Made with 🤖 for AI enthusiasts
+## AI Disclosure
+
+This project was created with assistance from AI (MiniMax M2.5). AI helped with:
+
+- Designing the project architecture
+- Refactoring code
+- Creating documentation and README
+- Debugging and fixing issues
+
+The ideas, functionality, and final decisions were made by human. This is not an official AI-generated project - it's a human project that used AI as a development tool.
+
+---
+
