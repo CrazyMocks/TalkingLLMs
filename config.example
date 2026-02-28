@@ -1,0 +1,29 @@
+# Example config file for TalkingLLMs
+# Lines starting with # are comments
+# Use key: value format
+# For multiline values, use double or single quotes
+
+# Agent names
+name1: Alice
+name2: Bob
+
+# Models (can be model IDs or numbers from model list)
+model1: google/gemini-2.0-flash-001
+model2: google/gemini-2.0-flash-001
+
+# Use paid models (true/false)
+paid: false
+
+# Number of messages to generate
+messages: 5
+
+# System prompts (inline)
+system1: You are a helpful and friendly assistant who loves to discuss technology.
+system2: You are a sarcastic assistant who questions everything.
+
+# Alternative: load system prompts from files
+# system1_file: prompts/my_custom_prompt.txt
+# system2_file: prompts/another_prompt.txt
+
+# Initial message
+init: Hello! Let's have an interesting conversation about AI.
