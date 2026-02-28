@@ -1,6 +1,6 @@
 import requests
 import json
-from .agent import Agent
+from agent import Agent
 
 
 class ConversationBtwAgents:

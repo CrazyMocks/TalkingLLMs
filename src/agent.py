@@ -1,7 +1,7 @@
 import requests
 import json
-from .message import Message
-from .utils import load_file
+from message import Message
+from utils import load_file
 class Agent:
     def __init__(self, model="openrouter/pony-alpha", typeOfAgent='', api_key="",temperature=1, system_prompt=""):
         self.typeOfAgent = typeOfAgent

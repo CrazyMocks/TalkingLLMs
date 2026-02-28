@@ -1,4 +1,4 @@
-from .message import Message
+from message import Message
 import os
 import importlib
 import inspect

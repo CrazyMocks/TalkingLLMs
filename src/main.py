@@ -3,10 +3,10 @@ import os
 import sys
 from datetime import datetime
 
-from talkingllms.agent import Agent
-from talkingllms.conversation import ConversationBtwAgents
-from talkingllms.message import Message
-from talkingllms.utils import load_file
+from agent import Agent
+from conversation import ConversationBtwAgents
+from message import Message
+from utils import load_file
 
 
 def get_api_key() -> str:
@@ -84,22 +84,22 @@ def main():
         description="Generate conversation between two LLM agents"
     )
     parser.add_argument(
-        "--name1", "-n1", help="Name of first agent", default=None
+        "--name1", "-n1", help="Name of first agent", default="Alice"
     )
     parser.add_argument(
-        "--name2", "-n2", help="Name of second agent", default=None
+        "--name2", "-n2", help="Name of second agent", default="Bob"
     )
     parser.add_argument(
-        "--system1", "-s1", help="System prompt for first agent", default=None
+        "--system1", "-s1", help="System prompt for first agent", default=""
     )
     parser.add_argument(
-        "--system2", "-s2", help="System prompt for second agent", default=None
+        "--system2", "-s2", help="System prompt for second agent", default=""
     )
     parser.add_argument(
-        "--init", "-i", help="Initial message", default=None
+        "--init", "-i", help="Initial message", default="Hej, porozmawiajmy o czymś interesującym"
     )
     parser.add_argument(
-        "--messages", "-m", type=int, help="Number of messages to generate", default=5
+        "--messages", "-m", type=int, help="Number of messages to generate", default=3
     )
     parser.add_argument(
         "--model", "-M", help="Model to use for both agents", 
@@ -135,16 +135,22 @@ def main():
         model2 = args.model2 or args.model
     else:
         while True:
-            name1 = prompt_model_selection("First agent name (e.g., Alice): ")
+            name1 = prompt_model_selection("First agent name (default Alice): ")
             if name1.strip():
                 break
-            print("  Please enter a name for the first agent")
+            else:
+                name1 = "Alice"
+                print(f"  Defaulting to {name1}")
+                break
         
         while True:
-            name2 = prompt_model_selection("Second agent name (e.g., Bob): ")
+            name2 = prompt_model_selection("Second agent name (default Bob): ")
             if name2.strip():
                 break
-            print("  Please enter a name for the second agent")
+            else:
+                name2 = "Bob"
+                print(f"  Defaulting to {name2}")
+                break
         
         print("\nAvailable models:")
         for i, m in enumerate(models, 1):
@@ -175,19 +181,22 @@ def main():
         print(f"\nEnter system prompt for {name1} (press Enter for default):")
         system_prompt1 = prompt_model_selection(
             "  > ", 
-            load_file(f"prompts/systemPrompt{name1}.txt") if os.path.exists(f"prompts/systemPrompt{name1}.txt") else "You are a helpful assistant."
+            load_file(f"prompts/systemPrompt{name1}.txt") if os.path.exists(f"prompts/defaultPrompt{name1}.txt") else "You are a helpful assistant."
         )
         print(f"\nEnter system prompt for {name2} (press Enter for default):")
         system_prompt2 = prompt_model_selection(
             "  > ",
-            load_file(f"prompts/systemPrompt{name2}.txt") if os.path.exists(f"prompts/systemPrompt{name2}.txt") else "You are a helpful assistant."
+            load_file(f"prompts/systemPrompt{name2}.txt") if os.path.exists(f"prompts/defaultPrompt{name2}.txt") else "You are a helpful assistant."
         )
         while True:
             print("\nEnter initial message:")
             initial_message = prompt_model_selection("  > ")
             if initial_message.strip():
                 break
-            print("  Please enter an initial message")
+            else:
+                initial_message = load_file(f"prompts/initialMessage.txt") if os.path.exists(f"prompts/initialMessage.txt") else "Hello!"
+                break
+
 
     num_messages = args.messages
 
@@ -205,7 +214,7 @@ def main():
         api_key=api_key,
     )
 
-    from talkingllms.pdf_generator import generate_pdf
+    from pdf_generator import generate_pdf
     generate_pdf(messages, args.output, name1, name2)
     
     print(f"\n=== Conversation saved to {args.output} ===")

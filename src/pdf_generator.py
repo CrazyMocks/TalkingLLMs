@@ -3,7 +3,7 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-from .message import Message
+from message import Message
 
 
 HTML_TEMPLATE = """<!doctype html>
@@ -153,7 +153,7 @@ HTML_TEMPLATE = """<!doctype html>
       return div.innerHTML;
     }}
     
-    const messages = {messages_json};
+    const messages = {messages};
     messages.forEach(msg => {{
       const div = document.createElement('div');
       div.className = 'message ' + msg.side;
