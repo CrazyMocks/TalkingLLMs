@@ -19,8 +19,8 @@ def get_api_key() -> str:
     return api_key
 
 
-def get_available_models():
-    return fetch_20_most_popular_openrouter_models()
+def get_available_models(paid=False):
+    return fetch_20_most_popular_openrouter_models(paid)
 
 
 def prompt_model_selection(prompt: str, default: str = "") -> str:
@@ -69,6 +69,7 @@ def generate_conversation(
             print(f"Warning: Failed to get response from {current_agent}, stopping conversation")
             break
         messages.append((Message("assistant", response), current_agent))
+        print(messages[-1][0].get_content())
         current_agent = name1 if current_agent == name2 else name2
 
     return messages
@@ -83,6 +84,12 @@ def main():
     )
     parser.add_argument(
         "--name2", "-n2", help="Name of second agent", default="Bob"
+    )
+    parser.add_argument(
+        "--systemPath1", "-sp1", help="System prompt file path for first agent", default=""
+    )
+    parser.add_argument(
+        "--systemPath2", "-sp2", help="System prompt file path for second agent", default=""
     )
     parser.add_argument(
         "--system1", "-s1", help="System prompt for first agent", default=""
@@ -117,8 +124,15 @@ def main():
     api_key = get_api_key()
 
     print("\n=== LLM Conversation Generator ===\n")
-
-    models = get_available_models()
+    paid=''
+    while (paid not in ['y','n','Y','N']):
+        paid = input("Do you want use paid models? (y/n): ")
+    paidFlag = False
+    if paid in ['y','Y']:
+        paidFlag = True
+    else:
+        paidFlag = False
+    models = get_available_models(paidFlag)
     models_formated_names = list(models.keys())
     
     
@@ -190,7 +204,7 @@ def main():
             if initial_message.strip():
                 break
             else:
-                initial_message = load_file(f"prompts/initialMessage.txt") if os.path.exists(f"prompts/initialMessage.txt") else "Hello!"
+                initial_message = load_file(f"default/initialMessage") if os.path.exists(f"default/initialMessage") else "Hello!"
                 break
 
 

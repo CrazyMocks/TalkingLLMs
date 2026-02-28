@@ -187,7 +187,7 @@ HTML_TEMPLATE = """<!doctype html>
     <p>{timestamp}</p>
   </div>
   <div class="metrics">
-    <p><strong>Liczba wiadomości:</strong> {num_of_messages}</p> 
+    <p><strong>Num of messages:</strong> {num_of_messages}</p> 
     <p><strong>Model {nameA}:</strong> {modelA}</p> 
     <p><strong>Model {nameB}:</strong> {modelB}</p>
   </div>

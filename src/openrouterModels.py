@@ -1,8 +1,10 @@
 import requests
 
-def fetch_20_most_popular_openrouter_models():
+def fetch_20_most_popular_openrouter_models(paid=False):
+    url = "https://openrouter.ai/api/frontend/models/find?order=most-popular&input_modalities=text&max_price=0&output_modalities=text"
+    if paid:
+        url = "https://openrouter.ai/api/frontend/models/find?order=most-popular&input_modalities=text&min_price=0.01&output_modalities=text"
     try:
-        url = "https://openrouter.ai/api/frontend/models/find?order=most-popular"
         data = requests.get(url, headers={"Accept": "application/json"}).json().get("data", {})
     except Exception:
         print("Failed to fetch or parse OpenRouter data")
@@ -39,7 +41,7 @@ def fetch_20_most_popular_openrouter_models():
     result = {}
     for slug, pop, p_price, c_price in valid_models[:20]:
         percent = (pop / max(total_popularity, 1)) * 100
-        formatted_name = f"{percent:04.1f}% {slug}\t[${p_price:.2f}/${c_price:.2f}]"
+        formatted_name = f"{percent:>5.1f}% {slug:<40}\t[${p_price:>4.2f}/${c_price:>4.2f}]"
         result[formatted_name] = slug
 
     return result
