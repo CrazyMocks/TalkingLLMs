@@ -55,11 +55,22 @@ def parse_config(config_path: str) -> dict:
             resolved_config[key] = value
     
     return resolved_config
+
+
+def load_env():
+    """Load environment variables from .env file."""
+    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+    if os.path.exists(env_path):
+        from dotenv import load_dotenv
+        load_dotenv(env_path)
+
+
 def get_api_key() -> str:
+    load_env()
     api_key = os.environ.get("OPENROUTER_API_KEY", "")
     if not api_key:
         print("Error: OPENROUTER_API_KEY environment variable not set")
-        print("Please set it with: export OPENROUTER_API_KEY=your_key")
+        print("Please set it in .env file or export OPENROUTER_API_KEY=your_key")
         sys.exit(1)
     return api_key
 

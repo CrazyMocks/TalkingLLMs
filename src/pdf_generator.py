@@ -261,8 +261,8 @@ def generate_pdf(
         nameB=name2,
         modelA=model1,
         modelB=model2,
-        system_prompt_a=system_prompt1 or "Brak system promptu",
-        system_prompt_b=system_prompt2 or "Brak system promptu",
+        system_prompt_a=system_prompt1 or "No system prompt",
+        system_prompt_b=system_prompt2 or "No system prompt",
     )
     
     with tempfile.NamedTemporaryFile(
