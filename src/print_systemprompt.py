@@ -1,3 +1,5 @@
+"""System prompt PDF generator module."""
+
 import os
 import sys
 
@@ -20,14 +22,18 @@ if sys.platform == "darwin":
     # Wstrzyknięcie do zmiennych środowiskowych procesu
     os.environ["DYLD_FALLBACK_LIBRARY_PATH"] = new_path
 # --- SENTINEL HOTFIX END ---
-import markdown
 import re
-from weasyprint import HTML, CSS
 from datetime import datetime
+
+import markdown
+from weasyprint import CSS, HTML
 
 
 class SentinelDocGenerator:
+    """Generator for Sentinel/CANVAS agent documentation."""
+
     def __init__(self):
+        """Initialize the document generator with CSS styles."""
         self.css_styles = """
             @page {
                 size: A4;
@@ -95,9 +101,7 @@ class SentinelDocGenerator:
         """
 
     def _normalize_tags(self, text):
-        """
-        Zamienia pseudo-tagi XML na Markdown H2 dla czytelności.
-        """
+        """Zamienia pseudo-tagi XML na Markdown H2 dla czytelności."""
         # Mapowanie tagów na ludzkie nagłówki
         tag_map = {
             r"<system_role>": "## Rola Systemowa",
@@ -119,6 +123,12 @@ class SentinelDocGenerator:
         return normalized_text.strip()
 
     def generate(self, raw_text, output_filename="Sentinel_Report.pdf"):
+        """Generate PDF document from raw text.
+
+        Args:
+            raw_text: The raw text content to convert.
+            output_filename: Output PDF filename.
+        """
         # remove file if exists
         if os.path.exists(output_filename):
             os.remove(output_filename)
@@ -126,10 +136,13 @@ class SentinelDocGenerator:
         markdown_text = self._normalize_tags(raw_text)
 
         # 2. Dodanie nagłówka dokumentu
-        typeOfAgent = "SENTINEL" if "Sentinel" in output_filename else "CANVAS"
-        header = f"# Specyfikacja Agenta {typeOfAgent}\n\n"
+        type_of_agent = "SENTINEL" if "Sentinel" in output_filename else "CANVAS"
+        header = f"# Specyfikacja Agenta {type_of_agent}\n\n"
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        meta = f"<div class='meta-info'>Generated: {timestamp} | Classification: INTERNAL</div>\n\n"
+        meta = (
+            f"<div class='meta-info'>Generated: {timestamp} | "
+            f"Classification: INTERNAL</div>\n\n"
+        )
 
         full_markdown = header + meta + markdown_text
 
@@ -137,14 +150,14 @@ class SentinelDocGenerator:
         html_content = markdown.markdown(full_markdown)
 
         # 4. Renderowanie PDF
-        print(f"[{typeOfAgent}] Generowanie pliku: {output_filename}...")
+        print(f"[{type_of_agent}] Generowanie pliku: {output_filename}...")
         try:
             HTML(string=html_content).write_pdf(
                 output_filename, stylesheets=[CSS(string=self.css_styles)]
             )
-            print(f"[{typeOfAgent}] SUKCES. Dokument gotowy do druku.")
-        except Exception as e:
-            print(f"[{typeOfAgent}] BŁĄD KRYTYCZNY: {e}")
+            print(f"[{type_of_agent}] SUKCES. Dokument gotowy do druku.")
+        except Exception as e:  # noqa: BLE001
+            print(f"[{type_of_agent}] BŁĄD KRYTYCZNY: {e}")
             print("Sprawdź, czy masz zainstalowane biblioteki GTK (dla WeasyPrint).")
 
 
