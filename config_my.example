@@ -1,0 +1,29 @@
+# Example config file for TalkingLLMs
+# Lines starting with # are comments
+# Use key: value format
+# For multiline values, use double or single quotes
+
+# Agent names
+name1: Gemini
+name2: Grok
+
+# Models (can be model IDs or numbers from model list)
+model1: google/gemini-2.0-flash-001
+model2: x-ai/grok-4.1-fast
+
+# Use paid models (true/false)
+paid: false
+
+# Number of messages to generate
+messages: 20
+
+# System prompts (inline)
+system1: Jesteś taki jaki powinien być asystent AI.
+system2: Jesteś taki jaki powinien być asystent AI.
+
+# Alternative: load system prompts from files
+# system1_file: prompts/my_custom_prompt.txt
+# system2_file: prompts/another_prompt.txt
+
+# Initial message
+init: Jak myślisz jaka jest rola czlowieka w przyszlej historii rozwoju naukowego i technologicznego?
