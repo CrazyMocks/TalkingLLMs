@@ -155,9 +155,7 @@ class TestConversationNextRequest:
 
         logger = Mock()
 
-        conv = ConversationBtwAgents(
-            agent1, agent2, first_agent="Alice", logger=logger
-        )
+        conv = ConversationBtwAgents(agent1, agent2, first_agent="Alice", logger=logger)
         conv.next_request()
 
         logger.log_message.assert_called_once_with(
@@ -188,9 +186,7 @@ class TestConversationNextRequest:
 
         logger = ConversationLogger("Alice", "Bob", str(tmp_path / "logs"))
 
-        conv = ConversationBtwAgents(
-            agent1, agent2, first_agent="Alice", logger=logger
-        )
+        conv = ConversationBtwAgents(agent1, agent2, first_agent="Alice", logger=logger)
         response = conv.next_request()
 
         assert response is None
