@@ -196,14 +196,10 @@ def get_real_docs(symbol_list):
                 docs += "Type: Module\n"
                 # Wypiszmy kluczowe klasy dostępne w module
                 # (limitujemy ilość żeby nie zapchać contextu)
-                attributes = [
-                    attr for attr in dir(obj) if not attr.startswith("_")
-                ]
+                attributes = [attr for attr in dir(obj) if not attr.startswith("_")]
                 # Filtrujemy tylko klasy, żeby odsiać śmieci
                 classes = [
-                    attr
-                    for attr in attributes
-                    if isinstance(getattr(obj, attr), type)
+                    attr for attr in attributes if isinstance(getattr(obj, attr), type)
                 ]
 
                 preview = ", ".join(classes[:50])  # Pierwsze 50 klas
@@ -224,9 +220,7 @@ def get_real_docs(symbol_list):
 
                 # 2. Docstring (Najważniejsze dla PyQt)
                 if obj.__doc__:
-                    docs += (
-                        f"Docstring:\n{obj.__doc__[:2000]}\n"  # Zwiększamy limit
-                    )
+                    docs += f"Docstring:\n{obj.__doc__[:2000]}\n"  # Zwiększamy limit
                 else:
                     # Ostatnia deska ratunku - help() capture
                     pass

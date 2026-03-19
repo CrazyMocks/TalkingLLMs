@@ -56,9 +56,7 @@ class Message:
             ValueError: If role is not valid.
         """
         if role not in ["user", "assistant", "system"]:
-            raise ValueError(
-                "Invalid role. Must be one of: user, assistant, system"
-            )
+            raise ValueError("Invalid role. Must be one of: user, assistant, system")
         self.role = role
 
     def set_content(self, content):

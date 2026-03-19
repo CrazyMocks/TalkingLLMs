@@ -136,9 +136,7 @@ class SentinelDocGenerator:
         markdown_text = self._normalize_tags(raw_text)
 
         # 2. Dodanie nagłówka dokumentu
-        type_of_agent = (
-            "SENTINEL" if "Sentinel" in output_filename else "CANVAS"
-        )
+        type_of_agent = "SENTINEL" if "Sentinel" in output_filename else "CANVAS"
         header = f"# Specyfikacja Agenta {type_of_agent}\n\n"
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         meta = (

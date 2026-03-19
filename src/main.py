@@ -403,8 +403,10 @@ def main():
                 print(f"  Defaulting to {num_messages}")
                 break
 
-    print(f"\n=== Generating {num_messages} messages "
-          f"between {name1} and {name2} ===\n")
+    print(
+        f"\n=== Generating {num_messages} messages "
+        f"between {name1} and {name2} ===\n"
+    )
 
     messages = generate_conversation(
         name1=name1,
