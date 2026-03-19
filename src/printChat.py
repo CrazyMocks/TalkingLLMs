@@ -10,12 +10,14 @@ HTML_FILENAME = "chat.html"  # Nazwa twojego pliku
 PDF_OUTPUT = "Chat_Export.pdf"
 PORT = 8080
 
+
 def start_server():
     """Uruchamia prosty serwer HTTP w tle, aby ominąć blokadę CORS."""
     handler = SimpleHTTPRequestHandler
     httpd = TCPServer(("", PORT), handler)
     print(f"[SENTINEL] Serwer lokalny uruchomiony na porcie {PORT}")
     httpd.serve_forever()
+
 
 def generate_pdf():
     # 1. Uruchomienie serwera w tle
@@ -41,7 +43,7 @@ def generate_pdf():
 
         # 4. WSTRZYKIWANIE CSS - WERSJA POPRAWIONA (High Fidelity)
         print("[SENTINEL] Aplikowanie stylów druku (wymuszanie tła)...")
-        
+
         css_injection = """
             /* 1. Ukrywamy panel boczny */
             .controls { display: none !important; }
@@ -75,7 +77,7 @@ def generate_pdf():
                 overflow: visible !important;
             }
         """
-        
+
         page.add_style_tag(content=css_injection)
 
         # 5. Generowanie PDF z opcją print_background=True
@@ -84,15 +86,18 @@ def generate_pdf():
             path=PDF_OUTPUT,
             format="A4",
             print_background=True,  # KLUCZOWE: Włącza renderowanie tła
-            margin={"top": "1cm", "right": "1cm", "bottom": "1cm", "left": "1cm"}
+            margin={"top": "1cm", "right": "1cm", "bottom": "1cm", "left": "1cm"},
         )
 
         browser.close()
         print("[SENTINEL] Dokument wygenerowany poprawnie.")
 
+
 if __name__ == "__main__":
     # Sprawdzenie czy pliki istnieją w katalogu roboczym
     if not os.path.exists(HTML_FILENAME):
-        print(f"[SENTINEL] BŁĄD: Nie znaleziono pliku {HTML_FILENAME} w bieżącym katalogu.")
+        print(
+            f"[SENTINEL] BŁĄD: Nie znaleziono pliku {HTML_FILENAME} w bieżącym katalogu."
+        )
     else:
         generate_pdf()

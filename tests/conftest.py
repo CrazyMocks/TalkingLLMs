@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import sys
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 
@@ -21,6 +22,7 @@ def temp_dir():
 def sample_message():
     """Create a sample Message object."""
     from message import Message
+
     return Message("user", "Hello, world!")
 
 
@@ -37,13 +39,7 @@ def mock_agent():
 @pytest.fixture
 def mock_openrouter_response():
     """Sample OpenRouter API response."""
-    return {
-        "choices": [{
-            "message": {
-                "content": "This is a test response."
-            }
-        }]
-    }
+    return {"choices": [{"message": {"content": "This is a test response."}}]}
 
 
 @pytest.fixture

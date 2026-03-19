@@ -236,21 +236,19 @@ def generate_pdf(
     style: str = "whatsapp",
 ) -> None:
     """Generate a PDF from messages using Playwright and HTML."""
-    
+
     # Tworzymy czystą strukturę danych i zrzucamy do JSON-a
     formatted_messages = []
     for message, sender in messages:
         side = "left" if sender == name1 else "right"
-        formatted_messages.append({
-            "sender": sender,
-            "content": message.get_content() or "",
-            "side": side
-        })
-    
+        formatted_messages.append(
+            {"sender": sender, "content": message.get_content() or "", "side": side}
+        )
+
     messages_json = json.dumps(formatted_messages)
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
     title = f"Chat between {name1} and {name2}"
-    
+
     # Podstawiamy dane pod odpowiednie klucze
     html_content = HTML_TEMPLATE.format(
         title=title,
@@ -264,13 +262,13 @@ def generate_pdf(
         system_prompt_a=system_prompt1 or "No system prompt",
         system_prompt_b=system_prompt2 or "No system prompt",
     )
-    
+
     with tempfile.NamedTemporaryFile(
         mode="w", suffix=".html", delete=False, encoding="utf-8"
     ) as html_file:
         html_file.write(html_content)
         html_path = html_file.name
-    
+
     try:
         _convert_html_to_pdf(html_path, output_path)
     finally:
@@ -286,18 +284,23 @@ def _convert_html_to_pdf(html_path: str, output_path: str) -> None:
         raise ImportError(
             "playwright is required for PDF generation. Install it with: pip install playwright && playwright install chromium"
         )
-    
+
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
-        
+
         page.goto(f"file://{html_path}", wait_until="networkidle")
-        
+
         page.pdf(
             path=output_path,
             format="A4",
             print_background=True,
-            margin={"top": "0.5cm", "right": "0.5cm", "bottom": "0.5cm", "left": "0.5cm"},
+            margin={
+                "top": "0.5cm",
+                "right": "0.5cm",
+                "bottom": "0.5cm",
+                "left": "0.5cm",
+            },
         )
-        
+
         browser.close()
