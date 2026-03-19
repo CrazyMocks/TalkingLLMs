@@ -1,8 +1,11 @@
+"""Print chat module for PDF generation from HTML chat files."""
+
 import os
-import time
 import threading
+import time
 from http.server import SimpleHTTPRequestHandler
 from socketserver import TCPServer
+
 from playwright.sync_api import sync_playwright
 
 # KONFIGURACJA
@@ -20,6 +23,7 @@ def start_server():
 
 
 def generate_pdf():
+    """Generate PDF from HTML chat file."""
     # 1. Uruchomienie serwera w tle
     server_thread = threading.Thread(target=start_server, daemon=True)
     server_thread.start()
@@ -38,7 +42,7 @@ def generate_pdf():
         # 3. Czekamy na załadowanie treści
         try:
             page.wait_for_selector(".message", timeout=5000)
-        except:
+        except Exception:  # noqa: BLE001
             print("[SENTINEL] OSTRZEŻENIE: Nie wykryto wiadomości.")
 
         # 4. WSTRZYKIWANIE CSS - WERSJA POPRAWIONA (High Fidelity)
@@ -47,7 +51,7 @@ def generate_pdf():
         css_injection = """
             /* 1. Ukrywamy panel boczny */
             .controls { display: none !important; }
-            
+
             /* 2. Resetujemy układ strony dla PDF */
             html, body {
                 height: auto !important;
@@ -55,7 +59,7 @@ def generate_pdf():
                 margin: 0 !important;
                 width: 100% !important;
             }
-            
+
             /* 3. WYMUSZENIE DRUKOWANIA KOLORÓW I TŁA */
             * {
                 -webkit-print-color-adjust: exact !important;
@@ -68,7 +72,7 @@ def generate_pdf():
                 display: block !important;
                 width: 100% !important;
             }
-            
+
             .chat {
                 max-width: 100% !important;
                 width: 100% !important;
@@ -86,7 +90,12 @@ def generate_pdf():
             path=PDF_OUTPUT,
             format="A4",
             print_background=True,  # KLUCZOWE: Włącza renderowanie tła
-            margin={"top": "1cm", "right": "1cm", "bottom": "1cm", "left": "1cm"},
+            margin={
+                "top": "1cm",
+                "right": "1cm",
+                "bottom": "1cm",
+                "left": "1cm",
+            },
         )
 
         browser.close()
@@ -97,7 +106,8 @@ if __name__ == "__main__":
     # Sprawdzenie czy pliki istnieją w katalogu roboczym
     if not os.path.exists(HTML_FILENAME):
         print(
-            f"[SENTINEL] BŁĄD: Nie znaleziono pliku {HTML_FILENAME} w bieżącym katalogu."
+            f"[SENTINEL] BŁĄD: Nie znaleziono pliku "
+            f"{HTML_FILENAME} w bieżącym katalogu."
         )
     else:
         generate_pdf()

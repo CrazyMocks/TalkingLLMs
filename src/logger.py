@@ -1,5 +1,6 @@
+"""Logger module for conversation logging."""
+
 import json
-import os
 from datetime import datetime
 from pathlib import Path
 
@@ -11,9 +12,9 @@ class ConversationLogger:
         """Initialize logger with agent names and log directory.
 
         Args:
-            name1: Name of first agent
-            name2: Name of second agent
-            log_dir: Directory for log files (default: logs)
+            name1: Name of first agent.
+            name2: Name of second agent.
+            log_dir: Directory for log files (default: logs).
         """
         self.name1 = name1
         self.name2 = name2
@@ -43,9 +44,9 @@ class ConversationLogger:
         """Log a single message to the JSONL file.
 
         Args:
-            sender: Name of the agent sending the message
-            content: Message content
-            role: Message role (user/assistant/system)
+            sender: Name of the agent sending the message.
+            content: Message content.
+            role: Message role (user/assistant/system).
         """
         entry = {
             "timestamp": datetime.now().isoformat(),

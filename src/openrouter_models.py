@@ -1,17 +1,35 @@
+"""OpenRouter models fetching module."""
+
 import requests
 
 
 def fetch_20_most_popular_openrouter_models(paid=False):
-    url = "https://openrouter.ai/api/frontend/models/find?order=most-popular&input_modalities=text&max_price=0&output_modalities=text"
+    """Fetch the 20 most popular models from OpenRouter.
+
+    Args:
+        paid: If True, fetch paid models only.
+
+    Returns:
+        Dictionary mapping formatted model names to model slugs.
+    """
+    url = (
+        "https://openrouter.ai/api/frontend/models/find?"
+        "order=most-popular&input_modalities=text&max_price=0&"
+        "output_modalities=text"
+    )
     if paid:
-        url = "https://openrouter.ai/api/frontend/models/find?order=most-popular&input_modalities=text&min_price=0.01&output_modalities=text"
+        url = (
+            "https://openrouter.ai/api/frontend/models/find?"
+            "order=most-popular&input_modalities=text&min_price=0.01&"
+            "output_modalities=text"
+        )
     try:
         data = (
             requests.get(url, headers={"Accept": "application/json"})
             .json()
             .get("data", {})
         )
-    except Exception:
+    except Exception:  # noqa: BLE001
         print("Failed to fetch or parse OpenRouter data")
         return {}
 
@@ -26,7 +44,8 @@ def fetch_20_most_popular_openrouter_models(paid=False):
         if not isinstance(m, dict):
             continue
 
-        # ZABEZPIECZENIE: Używamy "or {}" na wypadek gdyby "endpoint" był równy None
+        # ZABEZPIECZENIE: Używamy "or {}" na wypadek
+        # gdyby "endpoint" był równy None
         endpoint = m.get("endpoint") or {}
         pricing = endpoint.get("pricing") or {}
 
@@ -41,10 +60,10 @@ def fetch_20_most_popular_openrouter_models(paid=False):
 
             valid_models.append((m.get("slug"), popularity, p_price, c_price))
 
-    # 2. Sortowanie modeli malejąco według popularności (indeks 1 w krotce)
+    # 2. Sortowanie modeli malejąco według popularności
     valid_models.sort(key=lambda x: x[1], reverse=True)
 
-    # 3. Formatowanie i tworzenie docelowego słownika (tylko 20 pierwszych wyników)
+    # 3. Formatowanie i tworzenie docelowego słownika
     result = {}
     for slug, pop, p_price, c_price in valid_models[:20]:
         percent = (pop / max(total_popularity, 1)) * 100

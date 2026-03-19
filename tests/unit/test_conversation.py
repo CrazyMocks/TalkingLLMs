@@ -2,7 +2,7 @@
 
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
@@ -16,9 +16,9 @@ class TestConversationInit:
     def test_conversation_stores_agents(self):
         """Test that conversation stores both agents."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
 
         conv = ConversationBtwAgents(agent1, agent2)
 
@@ -30,9 +30,9 @@ class TestConversationInit:
     def test_conversation_default_first_agent(self):
         """Test that first agent is default when not specified."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
 
         conv = ConversationBtwAgents(agent1, agent2)
 
@@ -41,9 +41,9 @@ class TestConversationInit:
     def test_conversation_custom_first_agent(self):
         """Test setting custom first agent."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
 
         conv = ConversationBtwAgents(agent1, agent2, first_agent="Bob")
 
@@ -52,10 +52,10 @@ class TestConversationInit:
     def test_conversation_with_initial_message_first_agent(self):
         """Test conversation with initial message from first agent."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent1.request.return_value = "Hello from Alice"
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
 
         conv = ConversationBtwAgents(
             agent1, agent2, initial_message="Start", first_agent="Alice"
@@ -68,9 +68,9 @@ class TestConversationInit:
     def test_conversation_with_initial_message_second_agent(self):
         """Test conversation with initial message from second agent."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
         agent2.request.return_value = "Hello from Bob"
 
         conv = ConversationBtwAgents(
@@ -84,9 +84,9 @@ class TestConversationInit:
     def test_conversation_with_logger(self, tmp_path):
         """Test conversation accepts logger."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
 
         logger = ConversationLogger("Alice", "Bob", str(tmp_path / "logs"))
 
@@ -101,10 +101,10 @@ class TestConversationNextRequest:
     def test_next_request_from_first_agent(self):
         """Test next request from first agent."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent1.request.return_value = "Response from Alice"
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
 
         conv = ConversationBtwAgents(agent1, agent2, first_agent="Alice")
         response = conv.next_request()
@@ -116,9 +116,9 @@ class TestConversationNextRequest:
     def test_next_request_from_second_agent(self):
         """Test next request from second agent."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
         agent2.request.return_value = "Response from Bob"
 
         conv = ConversationBtwAgents(agent1, agent2, first_agent="Bob")
@@ -131,10 +131,10 @@ class TestConversationNextRequest:
     def test_next_request_switches_agents(self):
         """Test that next_request switches current agent."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent1.request.return_value = "Response"
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
 
         conv = ConversationBtwAgents(agent1, agent2, first_agent="Alice")
         assert conv.current_agent == "Alice"
@@ -148,14 +148,16 @@ class TestConversationNextRequest:
     def test_next_request_logs_message(self, tmp_path):
         """Test that next_request logs message when logger is present."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent1.request.return_value = "Response from Alice"
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
 
         logger = Mock()
 
-        conv = ConversationBtwAgents(agent1, agent2, first_agent="Alice", logger=logger)
+        conv = ConversationBtwAgents(
+            agent1, agent2, first_agent="Alice", logger=logger
+        )
         conv.next_request()
 
         logger.log_message.assert_called_once_with(
@@ -165,10 +167,10 @@ class TestConversationNextRequest:
     def test_next_request_no_log_when_no_logger(self):
         """Test that next_request doesn't fail without logger."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent1.request.return_value = "Response"
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
 
         conv = ConversationBtwAgents(agent1, agent2, first_agent="Alice")
         # Should not raise
@@ -179,14 +181,16 @@ class TestConversationNextRequest:
     def test_next_request_handles_none_response(self, tmp_path):
         """Test that next_request handles None response."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent1.request.return_value = None
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
 
         logger = ConversationLogger("Alice", "Bob", str(tmp_path / "logs"))
 
-        conv = ConversationBtwAgents(agent1, agent2, first_agent="Alice", logger=logger)
+        conv = ConversationBtwAgents(
+            agent1, agent2, first_agent="Alice", logger=logger
+        )
         response = conv.next_request()
 
         assert response is None
@@ -199,9 +203,9 @@ class TestConversationGetCurrentAgent:
     def test_get_current_agent_returns_string(self):
         """Test that get_current_agent returns agent name."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
 
         conv = ConversationBtwAgents(agent1, agent2, first_agent="Alice")
 
@@ -210,10 +214,10 @@ class TestConversationGetCurrentAgent:
     def test_get_current_agent_updates_after_next_request(self):
         """Test that get_current_agent reflects agent switches."""
         agent1 = Mock()
-        agent1.typeOfAgent = "Alice"
+        agent1.type_of_agent = "Alice"
         agent1.request.return_value = "Response"
         agent2 = Mock()
-        agent2.typeOfAgent = "Bob"
+        agent2.type_of_agent = "Bob"
 
         conv = ConversationBtwAgents(agent1, agent2, first_agent="Alice")
         assert conv.get_current_agent() == "Alice"

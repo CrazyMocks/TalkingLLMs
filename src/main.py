@@ -1,17 +1,17 @@
+"""Main module for the TalkingLLMs conversation generator."""
+
 import argparse
 import os
 import sys
-from datetime import datetime
-from typing import Optional
 
 from agent import Agent
 from conversation import ConversationBtwAgents
 from logger import ConversationLogger
 from message import Message
+from openrouter_models import fetch_20_most_popular_openrouter_models
 from utils import load_file
-from openrouterModels import fetch_20_most_popular_openrouter_models
 
-defaultModel = "arcee-ai/trinity-large-preview:free"
+default_model = "arcee-ai/trinity-large-preview:free"
 
 
 def parse_config(config_path: str) -> dict:
@@ -68,6 +68,7 @@ def load_env():
 
 
 def get_api_key() -> str:
+    """Get API key from environment."""
     load_env()
     api_key = os.environ.get("OPENROUTER_API_KEY", "")
     if not api_key:
@@ -78,10 +79,27 @@ def get_api_key() -> str:
 
 
 def get_available_models(paid=False):
+    """Get list of available models from OpenRouter.
+
+    Args:
+        paid: Whether to include paid models.
+
+    Returns:
+        Dictionary of available models.
+    """
     return fetch_20_most_popular_openrouter_models(paid)
 
 
 def prompt_model_selection(prompt: str, default: str = "") -> str:
+    """Prompt user for model selection.
+
+    Args:
+        prompt: Prompt text to display.
+        default: Default value if user enters nothing.
+
+    Returns:
+        User input or default value.
+    """
     value = input(prompt).strip()
     return value if value else default
 
@@ -98,15 +116,32 @@ def generate_conversation(
     api_key: str,
     log_dir: str = "logs",
 ) -> list[tuple[Message, str]]:
+    """Generate conversation between two agents.
+
+    Args:
+        name1: Name of first agent.
+        name2: Name of second agent.
+        system_prompt1: System prompt for first agent.
+        system_prompt2: System prompt for second agent.
+        initial_message: Initial message to start conversation.
+        num_messages: Number of messages to generate.
+        model1: Model for first agent.
+        model2: Model for second agent.
+        api_key: API key for LLM service.
+        log_dir: Directory for logs.
+
+    Returns:
+        List of messages with sender names.
+    """
     agent1 = Agent(
         model=model1,
-        typeOfAgent=name1,
+        type_of_agent=name1,
         api_key=api_key,
         system_prompt=system_prompt1,
     )
     agent2 = Agent(
         model=model2,
-        typeOfAgent=name2,
+        type_of_agent=name2,
         api_key=api_key,
         system_prompt=system_prompt2,
     )
@@ -131,7 +166,8 @@ def generate_conversation(
         response = conv.next_request()
         if response is None:
             print(
-                f"Warning: Failed to get response from {current_agent}, stopping conversation"
+                f"Warning: Failed to get response from {current_agent}, "
+                "stopping conversation"
             )
             break
         messages.append((Message("assistant", response), current_agent))
@@ -142,6 +178,7 @@ def generate_conversation(
 
 
 def main():
+    """Main entry point for the application."""
     parser = argparse.ArgumentParser(
         description="Generate conversation between two LLM agents"
     )
@@ -205,14 +242,14 @@ def main():
 
     config_paid = config_values.get("paid", "").lower()
     if config_paid in ["true", "1", "yes", "y"]:
-        paidFlag = True
+        paid_flag = True
     elif config_paid in ["false", "0", "no", "n", ""]:
-        paidFlag = False
+        paid_flag = False
     else:
         paid = ""
         while paid not in ["y", "n", "Y", "N"]:
             paid = input("Do you want use paid models? (y/n): ")
-        paidFlag = paid in ["y", "Y"]
+        paid_flag = paid in ["y", "Y"]
 
     config_model1 = config_values.get("model1", "")
     config_model2 = config_values.get("model2", "")
@@ -220,8 +257,10 @@ def main():
 
     if has_config_models:
         print(f"Using models from config: {config_model1}, {config_model2}")
+        models = {}
+        models_formated_names = []
     else:
-        models = get_available_models(paidFlag)
+        models = get_available_models(paid_flag)
         models_formated_names = list(models.keys())
 
     config_name1 = config_values.get("name1", "")
@@ -289,12 +328,12 @@ def main():
             for i, m in enumerate(models_formated_names, 1):
                 print(f"  {i}. {m}")
 
-            default_m1 = config_model1 if config_model1 else defaultModel
+            default_m1 = config_model1 if config_model1 else default_model
             print(f"Model for {name1}:")
             model1_choice = prompt_model_selection(
                 f"  (number or Enter for {default_m1}): "
             )
-            model1 = config_model1 or defaultModel
+            model1 = config_model1 or default_model
             if model1_choice:
                 try:
                     idx = int(model1_choice) - 1
@@ -305,7 +344,7 @@ def main():
 
             print(f"\nModel for {name2}:")
             model2_choice = prompt_model_selection(
-                f"  (number or Enter for same as above): "
+                "  (number or Enter for same as above): "
             )
             model2 = model1
             if model2_choice:
@@ -336,8 +375,8 @@ def main():
         system_prompt2 = prompt_model_selection("  > ", default_sys2)
 
         default_init = config_init or (
-            load_file(f"default/initialMessage")
-            if os.path.exists(f"default/initialMessage")
+            load_file("default/initialMessage")
+            if os.path.exists("default/initialMessage")
             else "Hello!"
         )
         while True:
@@ -364,7 +403,8 @@ def main():
                 print(f"  Defaulting to {num_messages}")
                 break
 
-    print(f"\n=== Generating {num_messages} messages between {name1} and {name2} ===\n")
+    print(f"\n=== Generating {num_messages} messages "
+          f"between {name1} and {name2} ===\n")
 
     messages = generate_conversation(
         name1=name1,

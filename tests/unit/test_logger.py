@@ -15,7 +15,7 @@ class TestLoggerCreation:
     def test_logger_creates_log_directory(self, tmp_path):
         """Test that logger creates log directory if it doesn't exist."""
         log_dir = tmp_path / "test_logs"
-        logger = ConversationLogger("Alice", "Bob", str(log_dir))
+        ConversationLogger("Alice", "Bob", str(log_dir))
         assert log_dir.exists()
         assert log_dir.is_dir()
 
@@ -23,7 +23,7 @@ class TestLoggerCreation:
         """Test that logger works with existing directory."""
         log_dir = tmp_path / "existing_logs"
         log_dir.mkdir()
-        logger = ConversationLogger("Alice", "Bob", str(log_dir))
+        ConversationLogger("Alice", "Bob", str(log_dir))
         assert log_dir.exists()
 
     def test_logger_creates_log_file_on_first_log(self, tmp_path):

@@ -2,7 +2,7 @@
 
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, mock_open
+from unittest.mock import Mock, mock_open, patch
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
@@ -16,7 +16,7 @@ class TestAgentInit:
         """Test agent with default values."""
         agent = Agent(api_key="test_key", system_prompt="Default system prompt")
         assert agent.model == "openrouter/pony-alpha"
-        assert agent.typeOfAgent == ""
+        assert agent.type_of_agent == ""
         assert agent.api_key == "test_key"
         assert agent.temperature == 1.0
 
@@ -24,13 +24,13 @@ class TestAgentInit:
         """Test agent with custom values."""
         agent = Agent(
             model="custom/model",
-            typeOfAgent="TestAgent",
+            type_of_agent="TestAgent",
             api_key="test_key",
             temperature=0.5,
             system_prompt="You are a test agent.",
         )
         assert agent.model == "custom/model"
-        assert agent.typeOfAgent == "TestAgent"
+        assert agent.type_of_agent == "TestAgent"
         assert agent.temperature == 0.5
         assert agent.system_prompt == "You are a test agent."
 
@@ -39,8 +39,8 @@ class TestAgentInit:
         mock_prompt = "Loaded from file"
         with patch("builtins.open", mock_open(read_data=mock_prompt)):
             with patch("os.path.exists", return_value=True):
-                agent = Agent(typeOfAgent="TestAgent", api_key="test_key")
-                # This would need the load_file function to be properly mocked
+                # TODO: Fix this test - needs proper mocking of load_file
+                Agent(type_of_agent="TestAgent", api_key="test_key")
 
     def test_agent_stores_system_message(self):
         """Test that agent stores system message on init."""
