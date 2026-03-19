@@ -28,7 +28,9 @@ class ConversationBtwAgents:
             else:
                 response = self.agent2.request(initial_message)
                 self.agent1.add_message(response)
-            self.current_agent = self.name2 if self.current_agent == self.name1 else self.name1
+            self.current_agent = (
+                self.name2 if self.current_agent == self.name1 else self.name1
+            )
 
     def next_request(self) -> Optional[str]:
         if self.current_agent == self.name1:
@@ -41,7 +43,9 @@ class ConversationBtwAgents:
             if response and self.logger:
                 self.logger.log_message(self.name2, response, "assistant")
             self.agent1.add_message(response)
-        self.current_agent = self.name2 if self.current_agent == self.name1 else self.name1
+        self.current_agent = (
+            self.name2 if self.current_agent == self.name1 else self.name1
+        )
         return response
 
     def get_current_agent(self) -> str:

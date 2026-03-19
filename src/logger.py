@@ -22,7 +22,9 @@ class ConversationLogger:
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.log_file = self.log_dir / f"conversation_{name1}_{name2}_{timestamp}.jsonl"
-        self.metadata_file = self.log_dir / f"conversation_{name1}_{name2}_{timestamp}_metadata.json"
+        self.metadata_file = (
+            self.log_dir / f"conversation_{name1}_{name2}_{timestamp}_metadata.json"
+        )
 
         self._write_metadata()
 

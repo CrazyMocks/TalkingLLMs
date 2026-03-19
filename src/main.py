@@ -11,12 +11,12 @@ from message import Message
 from utils import load_file
 from openrouterModels import fetch_20_most_popular_openrouter_models
 
-defaultModel = 'arcee-ai/trinity-large-preview:free'
+defaultModel = "arcee-ai/trinity-large-preview:free"
 
 
 def parse_config(config_path: str) -> dict:
     """Parse a human-readable config file.
-    
+
     Format:
         # Comments start with #
         key: value
@@ -27,15 +27,15 @@ def parse_config(config_path: str) -> dict:
     config = {}
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"Config file not found: {config_path}")
-    
-    with open(config_path, 'r') as f:
+
+    with open(config_path, "r") as f:
         for line in f:
             line = line.strip()
-            if not line or line.startswith('#'):
+            if not line or line.startswith("#"):
                 continue
-            if ':' not in line:
+            if ":" not in line:
                 continue
-            key, value = line.split(':', 1)
+            key, value = line.split(":", 1)
             key = key.strip()
             value = value.strip()
             if value.startswith('"') and value.endswith('"'):
@@ -43,10 +43,10 @@ def parse_config(config_path: str) -> dict:
             elif value.startswith("'") and value.endswith("'"):
                 value = value[1:-1]
             config[key] = value
-    
+
     resolved_config = {}
     for key, value in config.items():
-        if key.endswith('_file'):
+        if key.endswith("_file"):
             base_key = key[:-5]
             try:
                 resolved_config[base_key] = load_file(value)
@@ -54,15 +54,16 @@ def parse_config(config_path: str) -> dict:
                 raise FileNotFoundError(f"File not found for {key}: {value}")
         else:
             resolved_config[key] = value
-    
+
     return resolved_config
 
 
 def load_env():
     """Load environment variables from .env file."""
-    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
     if os.path.exists(env_path):
         from dotenv import load_dotenv
+
         load_dotenv(env_path)
 
 
@@ -129,7 +130,9 @@ def generate_conversation(
     for _ in range(num_messages):
         response = conv.next_request()
         if response is None:
-            print(f"Warning: Failed to get response from {current_agent}, stopping conversation")
+            print(
+                f"Warning: Failed to get response from {current_agent}, stopping conversation"
+            )
             break
         messages.append((Message("assistant", response), current_agent))
         print(messages[-1][0].get_content())
@@ -142,17 +145,19 @@ def main():
     parser = argparse.ArgumentParser(
         description="Generate conversation between two LLM agents"
     )
+    parser.add_argument("--name1", "-n1", help="Name of first agent", default="Alice")
+    parser.add_argument("--name2", "-n2", help="Name of second agent", default="Bob")
     parser.add_argument(
-        "--name1", "-n1", help="Name of first agent", default="Alice"
+        "--systemPath1",
+        "-sp1",
+        help="System prompt file path for first agent",
+        default="",
     )
     parser.add_argument(
-        "--name2", "-n2", help="Name of second agent", default="Bob"
-    )
-    parser.add_argument(
-        "--systemPath1", "-sp1", help="System prompt file path for first agent", default=""
-    )
-    parser.add_argument(
-        "--systemPath2", "-sp2", help="System prompt file path for second agent", default=""
+        "--systemPath2",
+        "-sp2",
+        help="System prompt file path for second agent",
+        default="",
     )
     parser.add_argument(
         "--system1", "-s1", help="System prompt for first agent", default=""
@@ -161,29 +166,30 @@ def main():
         "--system2", "-s2", help="System prompt for second agent", default=""
     )
     parser.add_argument(
-        "--init", "-i", help="Initial message", default="Hej, porozmawiajmy o czymś interesującym"
+        "--init",
+        "-i",
+        help="Initial message",
+        default="Hej, porozmawiajmy o czymś interesującym",
     )
     parser.add_argument(
         "--messages", "-m", type=int, help="Number of messages to generate", default=3
     )
     parser.add_argument(
-        "--model", "-M", help="Model to use for both agents", 
-        default="google/gemini-2.0-flash-001"
+        "--model",
+        "-M",
+        help="Model to use for both agents",
+        default="google/gemini-2.0-flash-001",
     )
-    parser.add_argument(
-        "--model1", "-m1", help="Model for first agent", 
-        default=None
-    )
-    parser.add_argument(
-        "--model2", "-m2", help="Model for second agent", 
-        default=None
-    )
+    parser.add_argument("--model1", "-m1", help="Model for first agent", default=None)
+    parser.add_argument("--model2", "-m2", help="Model for second agent", default=None)
     parser.add_argument(
         "--output", "-o", help="Output PDF file", default="conversation.pdf"
     )
     parser.add_argument(
-        "--config", "-c", help="Path to config file (human-readable format)", 
-        default=None
+        "--config",
+        "-c",
+        help="Path to config file (human-readable format)",
+        default=None,
     )
 
     args = parser.parse_args()
@@ -196,38 +202,45 @@ def main():
     api_key = get_api_key()
 
     print("\n=== LLM Conversation Generator ===\n")
-    
-    config_paid = config_values.get('paid', '').lower()
-    if config_paid in ['true', '1', 'yes', 'y']:
+
+    config_paid = config_values.get("paid", "").lower()
+    if config_paid in ["true", "1", "yes", "y"]:
         paidFlag = True
-    elif config_paid in ['false', '0', 'no', 'n', '']:
+    elif config_paid in ["false", "0", "no", "n", ""]:
         paidFlag = False
     else:
-        paid = ''
-        while paid not in ['y', 'n', 'Y', 'N']:
+        paid = ""
+        while paid not in ["y", "n", "Y", "N"]:
             paid = input("Do you want use paid models? (y/n): ")
-        paidFlag = paid in ['y', 'Y']
-    
-    config_model1 = config_values.get('model1', '')
-    config_model2 = config_values.get('model2', '')
+        paidFlag = paid in ["y", "Y"]
+
+    config_model1 = config_values.get("model1", "")
+    config_model2 = config_values.get("model2", "")
     has_config_models = bool(config_model1 and config_model2)
-    
+
     if has_config_models:
         print(f"Using models from config: {config_model1}, {config_model2}")
     else:
         models = get_available_models(paidFlag)
         models_formated_names = list(models.keys())
-    
-    
-    config_name1 = config_values.get('name1', '')
-    config_name2 = config_values.get('name2', '')
-    config_system1 = config_values.get('system1', '')
-    config_system2 = config_values.get('system2', '')
-    config_init = config_values.get('init', '')
-    config_messages = config_values.get('messages', '')
 
-    has_cli_args = args.name1 and args.name2 and args.system1 and args.system2 and args.init
-    has_config_args = config_name1 and config_name2 and config_system1 and config_system2 and config_init
+    config_name1 = config_values.get("name1", "")
+    config_name2 = config_values.get("name2", "")
+    config_system1 = config_values.get("system1", "")
+    config_system2 = config_values.get("system2", "")
+    config_init = config_values.get("init", "")
+    config_messages = config_values.get("messages", "")
+
+    has_cli_args = (
+        args.name1 and args.name2 and args.system1 and args.system2 and args.init
+    )
+    has_config_args = (
+        config_name1
+        and config_name2
+        and config_system1
+        and config_system2
+        and config_init
+    )
 
     if has_cli_args:
         name1 = args.name1
@@ -248,9 +261,9 @@ def main():
         model2 = config_model2
         num_messages = int(config_messages) if config_messages else args.messages
     else:
-        default_name1 = config_name1 or 'Alice'
-        default_name2 = config_name2 or 'Bob'
-        
+        default_name1 = config_name1 or "Alice"
+        default_name2 = config_name2 or "Bob"
+
         while True:
             prompt_text = f"First agent name (default {default_name1}): "
             name1 = prompt_model_selection(prompt_text)
@@ -260,7 +273,7 @@ def main():
                 name1 = default_name1
                 print(f"  Defaulting to {name1}")
                 break
-        
+
         while True:
             prompt_text = f"Second agent name (default {default_name2}): "
             name2 = prompt_model_selection(prompt_text)
@@ -270,15 +283,17 @@ def main():
                 name2 = default_name2
                 print(f"  Defaulting to {name2}")
                 break
-        
+
         if not has_config_models:
             print("\nAvailable models:")
             for i, m in enumerate(models_formated_names, 1):
                 print(f"  {i}. {m}")
-            
+
             default_m1 = config_model1 if config_model1 else defaultModel
             print(f"Model for {name1}:")
-            model1_choice = prompt_model_selection(f"  (number or Enter for {default_m1}): ")
+            model1_choice = prompt_model_selection(
+                f"  (number or Enter for {default_m1}): "
+            )
             model1 = config_model1 or defaultModel
             if model1_choice:
                 try:
@@ -287,9 +302,11 @@ def main():
                         model1 = models[models_formated_names[idx]]
                 except ValueError:
                     model1 = model1_choice
-            
+
             print(f"\nModel for {name2}:")
-            model2_choice = prompt_model_selection(f"  (number or Enter for same as above): ")
+            model2_choice = prompt_model_selection(
+                f"  (number or Enter for same as above): "
+            )
             model2 = model1
             if model2_choice:
                 try:
@@ -301,16 +318,28 @@ def main():
         else:
             model1 = config_model1
             model2 = config_model2
-        
-        default_sys1 = config_system1 or (load_file(f"prompts/systemPrompt{name1}.txt") if os.path.exists(f"prompts/defaultPrompt{name1}.txt") else "You are a helpful assistant.")
+
+        default_sys1 = config_system1 or (
+            load_file(f"prompts/systemPrompt{name1}.txt")
+            if os.path.exists(f"prompts/defaultPrompt{name1}.txt")
+            else "You are a helpful assistant."
+        )
         print(f"\nEnter system prompt for {name1} (press Enter for default):")
         system_prompt1 = prompt_model_selection("  > ", default_sys1)
-        
-        default_sys2 = config_system2 or (load_file(f"prompts/systemPrompt{name2}.txt") if os.path.exists(f"prompts/defaultPrompt{name2}.txt") else "You are a helpful assistant.")
+
+        default_sys2 = config_system2 or (
+            load_file(f"prompts/systemPrompt{name2}.txt")
+            if os.path.exists(f"prompts/defaultPrompt{name2}.txt")
+            else "You are a helpful assistant."
+        )
         print(f"\nEnter system prompt for {name2} (press Enter for default):")
         system_prompt2 = prompt_model_selection("  > ", default_sys2)
-        
-        default_init = config_init or (load_file(f"default/initialMessage") if os.path.exists(f"default/initialMessage") else "Hello!")
+
+        default_init = config_init or (
+            load_file(f"default/initialMessage")
+            if os.path.exists(f"default/initialMessage")
+            else "Hello!"
+        )
         while True:
             print("\nEnter initial message:")
             initial_message = prompt_model_selection("  > ", default_init)
@@ -319,7 +348,7 @@ def main():
             else:
                 initial_message = default_init
                 break
-        
+
         default_msgs = config_messages or str(args.messages)
         while True:
             print(f"\nNumber of messages to generate (default {default_msgs}):")
@@ -350,8 +379,9 @@ def main():
     )
 
     from pdf_generator import generate_pdf
+
     generate_pdf(messages, args.output, name1, name2, model1, model2)
-    
+
     print(f"\n=== Conversation saved to {args.output} ===")
 
 
