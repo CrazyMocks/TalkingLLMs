@@ -6,6 +6,7 @@ from typing import Optional
 
 from agent import Agent
 from conversation import ConversationBtwAgents
+from logger import ConversationLogger
 from message import Message
 from utils import load_file
 from openrouterModels import fetch_20_most_popular_openrouter_models
@@ -94,6 +95,7 @@ def generate_conversation(
     model1: str,
     model2: str,
     api_key: str,
+    log_dir: str = "logs",
 ) -> list[tuple[Message, str]]:
     agent1 = Agent(
         model=model1,
@@ -108,11 +110,16 @@ def generate_conversation(
         system_prompt=system_prompt2,
     )
 
+    logger = ConversationLogger(name1, name2, log_dir)
+    logger.log_message(name1, initial_message, "user")
+    print(f"Real-time logging enabled: {logger.get_log_path()}")
+
     conv = ConversationBtwAgents(
         agent1,
         agent2,
         initial_message=initial_message,
         first_agent=name1,
+        logger=logger,
     )
 
     messages = []
