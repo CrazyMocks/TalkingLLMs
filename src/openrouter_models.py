@@ -71,9 +71,7 @@ def fetch_20_most_popular_openrouter_models(paid=False):
         # Use .4f for small prices, .2f for larger ones
         p_price_str = f"{p_price:.4f}" if p_price < 0.01 else f"{p_price:.2f}"
         c_price_str = f"{c_price:.4f}" if c_price < 0.01 else f"{c_price:.2f}"
-        formatted_name = (
-            f"{percent:>5.1f}% {slug:<40}\t[${p_price_str}/${c_price_str}]"
-        )
+        formatted_name = f"{percent:>5.1f}% {slug:<40}\t[${p_price_str}/${c_price_str}]"
         result[formatted_name] = slug
 
     return result
