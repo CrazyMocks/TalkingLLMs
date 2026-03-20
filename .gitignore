@@ -210,6 +210,6 @@ __marimo__/
 # openCode
 AGENTS.md
 
-logs/*
-my_configs/*
-prompts/*
+logs/
+prompts/
+my_configs/
