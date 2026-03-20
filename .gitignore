@@ -209,3 +209,7 @@ __marimo__/
 .DS_Store
 # openCode
 AGENTS.md
+
+logs/*
+my_configs/*
+prompts/*
