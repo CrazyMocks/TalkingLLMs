@@ -422,7 +422,16 @@ def main():
 
     from pdf_generator import generate_pdf
 
-    generate_pdf(messages, args.output, name1, name2, model1, model2)
+    generate_pdf(
+        messages,
+        args.output,
+        name1,
+        name2,
+        model1,
+        model2,
+        system_prompt1=system_prompt1,
+        system_prompt2=system_prompt2,
+    )
 
     print(f"\n=== Conversation saved to {args.output} ===")
 
