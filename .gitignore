@@ -212,3 +212,5 @@ AGENTS.md
 
 # Conversation logs
 logs/
+prompts/
+my_configs/
