@@ -68,6 +68,8 @@ HTML_TEMPLATE = """<!doctype html>
       border-radius: 12px;
       line-height: 1.5;
       word-wrap: break-word;
+      word-break: break-word;
+      overflow-wrap: anywhere;
       font-size: 14px;
     }}
 
